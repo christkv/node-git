@@ -16,8 +16,10 @@
 extern "C" {
   // Git inclue files
   #include "deps/libgit2/src/common.h"
+  #include "deps/libgit2/src/commit.h"
   #include "deps/libgit2/src/git/odb.h"
   #include "deps/libgit2/src/git/commit.h"
+  #include "deps/libgit2/src/git/revwalk.h"
 }
 
 #include <iostream>
@@ -25,22 +27,52 @@ extern "C" {
 
 using namespace v8;
 
+static const int commit_sorting_topo[] = {0, 1, 2, 3, 5, 4};
+static const int commit_sorting_time[] = {0, 3, 1, 2, 5, 4};
+static const int commit_sorting_topo_reverse[] = {4, 5, 3, 2, 1, 0};
+static const int commit_sorting_time_reverse[] = {4, 5, 2, 1, 3, 0};
+static const int commit_sorting_topo_time[] = {0};
+
 Handle<Value> hello(const Arguments& args) {
   HandleScope scope;
   
-  struct stat stFileInfo;
   String::Utf8Value path(args[0]->ToString());
   char* cpath=*path;
-  int intStat = stat(cpath,&stFileInfo); 
 
   // Let's open the git repository
   git_odb *db;
-  int ret;
+  git_revpool *pool;
   
   if(git_odb_open(&db, cpath)) {
-    return String::New("true");    
-  } else {
-    return String::New("false");          
+    return String::New("failed to open");          
+  }
+  
+  pool = gitrp_alloc(db);
+
+  if(pool == NULL) {
+    return String::New("failed to allocate pool");
+  }
+
+  printf("================ pool allocated\n");
+  
+  #define TEST_WALK(sort_flags, result_array) {\
+    printf("=============================== executing TEST_WALK\n");\
+    char oid[40]; int i = 0;\
+    git_commit *commit = NULL;\
+    gitrp_sorting(pool, sort_flags);\
+    while ((commit = gitrp_next(pool)) != NULL) {\
+      printf("------------- hello\n");\
+      git_oid_fmt(oid, &commit->object.id);\
+    }\
+    gitrp_reset(pool);\
+  }  
+  
+  TEST_WALK(GIT_RPSORT_TIME, commit_sorting_time);
+  TEST_WALK(GIT_RPSORT_TOPOLOGICAL, commit_sorting_topo);
+  TEST_WALK(GIT_RPSORT_TIME | GIT_RPSORT_REVERSE, commit_sorting_time_reverse);
+  TEST_WALK(GIT_RPSORT_TOPOLOGICAL | GIT_RPSORT_REVERSE, commit_sorting_topo_reverse);  
+    
+  return String::New(cpath);    
   }
   
   // 
@@ -98,7 +130,7 @@ Handle<Value> hello(const Arguments& args) {
   // }  
   // return new v8::String::New("hello world");  
   // return String::New("hello world");  
-}
+// }
 
 extern "C" void init (Handle<Object> target) {
   HandleScope scope;
