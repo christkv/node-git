@@ -126,7 +126,9 @@ suite.addTests({
   // Heads
   "Should correctly return the current head":function(assert, finished) {
     var repo = new Repo("./test/dot_git", {is_bare:true});
+    sys.puts("=================================== 1")
     repo.head(function(err, head) {
+      sys.puts("=================================== 2")
       assert.ok(head instanceof Head);
       assert.equals('master', head.name);
       
