@@ -131,7 +131,7 @@ suite.addTests({
       assert.equal('master', head.name);
       
       repo.commits(head.name, function(err, commits) {
-        assert.equals('ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a', commits[0].id);
+        assert.equal('ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a', commits[0].id);
         finished();
       });
     })
