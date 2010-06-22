@@ -125,28 +125,30 @@ suite.addTests({
   
   // Heads
   "Should correctly return the current head":function(assert, finished) {
-    var repo = new Repo("./test/dot_git", {is_bare:true});
-    repo.head(function(err, head) {
-      assert.ok(head instanceof Head);
-      assert.equal('master', head.name);
-      
-      repo.commits(head.name, function(err, commits) {
-        assert.equal('ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a', commits[0].id);
-        finished();
-      });
-    })
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      repo.head(function(err, head) {
+        assert.ok(head instanceof Head);
+        assert.equal('master', head.name);
+
+        repo.commits(head.name, function(err, commits) {
+          assert.equal('ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a', commits[0].id);
+          finished();
+        });
+      })      
+    });
   },
   
-  // "Should correcty return array of head objects":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   repo.heads(function(err, heads) {
-  //     heads.forEach(function(head) {
-  //       assert.ok(head instanceof Head);        
-  //     })
-  //     finished();
-  //   })
-  // },
-  // 
+  "Should correcty return array of head objects":function(assert, finished) {
+    new Repo("./test/..", function(err, repo) {
+      repo.heads(function(err, heads) {
+        heads.forEach(function(head) {
+          assert.ok(head instanceof Head);        
+        })
+        finished();
+      })      
+    });
+  },
+  
   // "Should populate head data":function(assert, finished) {
   //   var repo = new Repo("./test/dot_git", {is_bare:true});
   //   repo.heads(function(err, heads) {
