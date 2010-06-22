@@ -18,9 +18,6 @@ suite.addTests({
     var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881'
     var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce'
 
-    sys.puts(JSON.stringify(git))
-
-    
     finished();
   }
 });

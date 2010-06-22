@@ -129,7 +129,7 @@ suite.addTests({
       repo.head(function(err, head) {
         assert.ok(head instanceof Head);
         assert.equal('master', head.name);
-
+  
         repo.commits(head.name, function(err, commits) {
           assert.equal('ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a', commits[0].id);
           finished();
@@ -149,19 +149,18 @@ suite.addTests({
     });
   },
   
-  // "Should populate head data":function(assert, finished) {
-  //   var repo = new Repo("./test/dot_git", {is_bare:true});
-  //   repo.heads(function(err, heads) {
-  //     var head = heads[0];
-  //     
-  //     assert.equals('test/master', head.name);
-  //     head.commit(function(err, commit) {
-  //       assert.equals('2d3acf90f35989df8f262dc50beadc4ee3ae1560', commit.id);
-  //       finished();
-  //     })
-  //   })
-  // },
-  // 
+  "Should populate head data":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      repo.heads(function(err, heads) {
+        var head = heads[1];
+
+        assert.equal('test/master', head.name);        
+        assert.equal('2d3acf90f35989df8f262dc50beadc4ee3ae1560', head.commit.id);
+        finished();
+      })      
+    });
+  },
+  
   // // Commits
   // 
   // "Should correctly fetch commits":function(assert, finished) {
