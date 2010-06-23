@@ -8,6 +8,7 @@ var TestSuite = require('async_testing').TestSuite,
   Head = require('git/head').Head,
   Blob = require('git/blob').Blob,
   Tree = require('git/tree').Tree,
+  Git = require('git/git').Git,
   Commit = require('git/commit').Commit,
   GitFileOperations = require('git/git_file_operations').GitFileOperations,
   fs = require('fs'),
@@ -33,7 +34,7 @@ var create_tmp_directory = function(clone_path, callback) {
 }
 
 var fixture = function(name) {
-  fs.readFileSync("./test/fixtures/" + name);
+  return fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
 var destroy_directory = function(directory, callback) {
@@ -123,6 +124,8 @@ suite.addTests({
   //   })    
   // },
   
+  // -------------------------------------- PASSING
+  
   // Heads
   "Should correctly return the current head":function(assert, finished) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
@@ -153,7 +156,7 @@ suite.addTests({
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.heads(function(err, heads) {
         var head = heads[1];
-
+  
         assert.equal('test/master', head.name);        
         assert.equal('2d3acf90f35989df8f262dc50beadc4ee3ae1560', head.commit.id);
         finished();
@@ -161,50 +164,45 @@ suite.addTests({
     });
   },
   
-  // // Commits
-  // 
-  // "Should correctly fetch commits":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   Git.prototype.rev_list = function() { return fixture('rev_list')};
-  //   
-  //   repo.commits('master', 10, function(err, commits) {
-  //     var commit = commits[0];
-  //     
-  //     assert.equals('4c8124ffcf4039d292442eeccabdeca5af5c5017', c.id);
-  //     commit.parents(function(err, p_commits) {
-  //       var p_commit_ids = p_commits.map(function(p_commit) {
-  //         return p_commit.id;
-  //       })
-  //       assert.deepEqual(["634396b2f541a9f2d58b00be1a07f0c358b999b3"], p_commit_ids);
-  //     })
-  //     
-  //     assert.equals('672eca9b7f9e09c22dcb128c283e8c3c8d7697a4', commit.tree.id);
-  //     assert.equals('Tom Preston-Werner', commit.author.name);
-  //     assert.equals('tom@mojombo.com', commit.author.email);
-  //     assert.equals(new Date(1191999972*1000), commit.authored_date);
-  //     assert.equals('Tom Preston-Werner', commit.committer.name);
-  //     assert.equals('tom@mojombo.com', commit.committer.email);
-  //     assert.equals(new Date(1191999972*1000), commit.committed_date);
-  //     assert.equals('implement Grit#heads', commit.message);
-  //     
-  //     commit = commits[1];
-  //     commit.parents(function(err, p_commits) {
-  //       assert.deepEqual([], p_commits);
-  //     })
-  //     
-  //     commit = commits[2]
-  //     commit.parents(function(err, p_commits) {
-  //       var p_commit_ids = p_commits.map(function(p_commit) {
-  //         return p_commit.id;
-  //       })        
-  //       assert.deepEqual(["6e64c55896aabb9a7d8e9f8f296f426d21a78c2c", "7f874954efb9ba35210445be456c74e037ba6af2"], p_commit_ids);
-  //     })
-  //     assert.equals("Merge branch 'site'\n\n  * Some other stuff\n  * just one more", commit.message);
-  //     assert.equals("Merge branch 'site'", commit.short_message);
-  //     finished();
-  //   })
-  // },
-  // 
+  // Commits
+  
+  "Should correctly fetch commits":function(assert, finished) {
+    new Repo("./..", {is_bare:true}, function(err, repo) {
+      Git.prototype.rev_list = function(options, string, callback) { callback(null, fixture('rev_list')); };
+
+      repo.commits('master', 10, function(err, commits) {
+        var commit = commits[0];
+
+        assert.equal('4c8124ffcf4039d292442eeccabdeca5af5c5017', commit.id);
+        var p_commit_ids = commit.parents.map(function(p_commit) { return p_commit.id; });
+        assert.deepEqual(["634396b2f541a9f2d58b00be1a07f0c358b999b3"], p_commit_ids);
+
+        assert.equal('672eca9b7f9e09c22dcb128c283e8c3c8d7697a4', commit.tree.id);
+        assert.equal('Tom Preston-Werner', commit.author.name);
+        assert.equal('tom@mojombo.com', commit.author.email);
+        assert.deepEqual(new Date(1191999972*1000), commit.authored_date);
+        
+        assert.equal('Tom Preston-Werner', commit.comitter.name);
+        assert.equal('tom@mojombo.com', commit.comitter.email);
+        assert.deepEqual(new Date(1191999972*1000), commit.committed_date);
+        assert.equal('implement Grit#heads', commit.message);
+
+        // Check commit 1
+        assert.deepEqual([], commits[1].parents)
+
+        // Check commit 2
+        p_commit_ids = commits[2].parents.map(function(p_commit) { return p_commit.id; });
+        assert.deepEqual(["6e64c55896aabb9a7d8e9f8f296f426d21a78c2c", "7f874954efb9ba35210445be456c74e037ba6af2"], p_commit_ids);
+        
+        assert.equal("Merge branch 'site'\n\n  * Some other stuff\n  * just one more", commits[2].message);
+        assert.equal("Merge branch 'site'", commits[2].short_message);
+        finished();
+      })      
+    });
+  },
+  
+  // -------------------------------------- PASSING END  
+  
   // // commit count
   // "Should correctly retrieve the commit count":function(assert, finished) {
   //   var repo = new Repo("./..", {is_bare:true});
