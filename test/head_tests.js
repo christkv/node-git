@@ -205,7 +205,8 @@ suite.addTests({
   
   // commit count
   "Should correctly retrieve the commit":function(assert, finished) {
-    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+    // new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
       repo.commit('634396b2f541a9f2d58b00be1a07f0c358b999b3', function(err, commit) {
         assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', commit.id);
         finished();
