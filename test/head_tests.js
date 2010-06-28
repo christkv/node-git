@@ -124,47 +124,47 @@ suite.addTests({
   //   })    
   // },
   
-  // // -------------------------------------- PASSING
-  // 
-  // // Heads
-  // "Should correctly return the current head":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.head(function(err, head) {
-  //       assert.ok(head instanceof Head);
-  //       assert.equal('master', head.name);
-  // 
-  //       repo.commits(head.name, function(err, commits) {
-  //         assert.equal('ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a', commits[0].id);
-  //         finished();
-  //       });
-  //     })      
-  //   });
-  // },
-  // 
-  // "Should correcty return array of head objects":function(assert, finished) {
-  //   new Repo("./test/..", function(err, repo) {
-  //     repo.heads(function(err, heads) {
-  //       heads.forEach(function(head) {
-  //         assert.ok(head instanceof Head);        
-  //       })
-  //       finished();
-  //     })      
-  //   });
-  // },
-  // 
-  // "Should populate head data":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.heads(function(err, heads) {
-  //       var head = heads[1];
-  // 
-  //       assert.equal('test/master', head.name);        
-  //       assert.equal('2d3acf90f35989df8f262dc50beadc4ee3ae1560', head.commit.id);
-  //       finished();
-  //     })      
-  //   });
-  // },
-  // 
-  // // Commits
+  // -------------------------------------- PASSING
+  
+  // Heads
+  "Should correctly return the current head":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      repo.head(function(err, head) {
+        assert.ok(head instanceof Head);
+        assert.equal('master', head.name);
+  
+        repo.commits(head.name, function(err, commits) {
+          assert.equal('ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a', commits[0].id);
+          finished();
+        });
+      })      
+    });
+  },
+  
+  "Should correcty return array of head objects":function(assert, finished) {
+    new Repo("./test/..", function(err, repo) {
+      repo.heads(function(err, heads) {
+        heads.forEach(function(head) {
+          assert.ok(head instanceof Head);        
+        })
+        finished();
+      })      
+    });
+  },
+  
+  "Should populate head data":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      repo.heads(function(err, heads) {
+        var head = heads[1];
+  
+        assert.equal('test/master', head.name);        
+        assert.equal('2d3acf90f35989df8f262dc50beadc4ee3ae1560', head.commit.id);
+        finished();
+      })      
+    });
+  },
+  
+  // Commits
   // 
   // "Should correctly fetch commits":function(assert, finished) {
   //   new Repo("./..", {is_bare:true}, function(err, repo) {
@@ -200,10 +200,7 @@ suite.addTests({
   //     })      
   //   });
   // },
-  // 
-  // // -------------------------------------- PASSING END  
   
-  // commit count
   "Should correctly retrieve the commit":function(assert, finished) {
     // new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
@@ -214,19 +211,22 @@ suite.addTests({
     });
   },
   
-  "Should correctly retrieve the commit count":function(assert, finished) {
-    // new Repo("./..", {is_bare:true}, function(err, repo) {
-    //   repo.commit('634396b2f541a9f2d58b00be1a07f0c358b999b3', function(err, commit) {
-    //     sys.puts("================= err: " + err)
-    //     sys.puts("================= commit: " + sys.inspect(commit))
-    //     
-    //     assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', commit.id);
-    //     finished();
-    //   })      
-    // });    
-    finished();
-  }
-  
+  // -------------------------------------- PASSING END  
+
+  // // commit count
+  // "Should correctly retrieve the commit count":function(assert, finished) {
+  //   // new Repo("./..", {is_bare:true}, function(err, repo) {
+  //   //   repo.commit('634396b2f541a9f2d58b00be1a07f0c358b999b3', function(err, commit) {
+  //   //     sys.puts("================= err: " + err)
+  //   //     sys.puts("================= commit: " + sys.inspect(commit))
+  //   //     
+  //   //     assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', commit.id);
+  //   //     finished();
+  //   //   })      
+  //   // });    
+  //   finished();
+  // }
+  // 
   // // tree
   // "Should correctly retrieve the repo tree":function(assert, finished) {
   //   var repo = new Repo("./..", {is_bare:true});
