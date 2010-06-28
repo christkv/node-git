@@ -165,41 +165,47 @@ suite.addTests({
   },
   
   // Commits
-  // 
-  // "Should correctly fetch commits":function(assert, finished) {
-  //   new Repo("./..", {is_bare:true}, function(err, repo) {
-  //     Git.prototype.rev_list = function(options, string, callback) { callback(null, fixture('rev_list')); };
-  // 
-  //     repo.commits('master', 10, function(err, commits) {
-  //       var commit = commits[0];
-  // 
-  //       assert.equal('4c8124ffcf4039d292442eeccabdeca5af5c5017', commit.id);
-  //       var p_commit_ids = commit.parents.map(function(p_commit) { return p_commit.id; });
-  //       assert.deepEqual(["634396b2f541a9f2d58b00be1a07f0c358b999b3"], p_commit_ids);
-  // 
-  //       assert.equal('672eca9b7f9e09c22dcb128c283e8c3c8d7697a4', commit.tree.id);
-  //       assert.equal('Tom Preston-Werner', commit.author.name);
-  //       assert.equal('tom@mojombo.com', commit.author.email);
-  //       assert.deepEqual(new Date(1191999972*1000), commit.authored_date);
-  //       
-  //       assert.equal('Tom Preston-Werner', commit.comitter.name);
-  //       assert.equal('tom@mojombo.com', commit.comitter.email);
-  //       assert.deepEqual(new Date(1191999972*1000), commit.committed_date);
-  //       assert.equal('implement Grit#heads', commit.message);
-  // 
-  //       // Check commit 1
-  //       assert.deepEqual([], commits[1].parents)
-  // 
-  //       // Check commit 2
-  //       p_commit_ids = commits[2].parents.map(function(p_commit) { return p_commit.id; });
-  //       assert.deepEqual(["6e64c55896aabb9a7d8e9f8f296f426d21a78c2c", "7f874954efb9ba35210445be456c74e037ba6af2"], p_commit_ids);
-  //       
-  //       assert.equal("Merge branch 'site'\n\n  * Some other stuff\n  * just one more", commits[2].message);
-  //       assert.equal("Merge branch 'site'", commits[2].short_message);
-  //       finished();
-  //     })      
-  //   });
-  // },
+  
+  "Should correctly fetch commits":function(assert, finished) {
+    new Repo("./..", {is_bare:true}, function(err, repo) {
+      // Save function we are mocking
+      var back = Git.prototype.rev_list;
+      // Repace mocked function
+      Git.prototype.rev_list = function(options, string, callback) { callback(null, fixture('rev_list')); };
+  
+      repo.commits('master', 10, function(err, commits) {
+        var commit = commits[0];
+  
+        assert.equal('4c8124ffcf4039d292442eeccabdeca5af5c5017', commit.id);
+        var p_commit_ids = commit.parents.map(function(p_commit) { return p_commit.id; });
+        assert.deepEqual(["634396b2f541a9f2d58b00be1a07f0c358b999b3"], p_commit_ids);
+  
+        assert.equal('672eca9b7f9e09c22dcb128c283e8c3c8d7697a4', commit.tree.id);
+        assert.equal('Tom Preston-Werner', commit.author.name);
+        assert.equal('tom@mojombo.com', commit.author.email);
+        assert.deepEqual(new Date(1191999972*1000), commit.authored_date);
+        
+        assert.equal('Tom Preston-Werner', commit.comitter.name);
+        assert.equal('tom@mojombo.com', commit.comitter.email);
+        assert.deepEqual(new Date(1191999972*1000), commit.committed_date);
+        assert.equal('implement Grit#heads', commit.message);
+  
+        // Check commit 1
+        assert.deepEqual([], commits[1].parents)
+  
+        // Check commit 2
+        p_commit_ids = commits[2].parents.map(function(p_commit) { return p_commit.id; });
+        assert.deepEqual(["6e64c55896aabb9a7d8e9f8f296f426d21a78c2c", "7f874954efb9ba35210445be456c74e037ba6af2"], p_commit_ids);
+        
+        assert.equal("Merge branch 'site'\n\n  * Some other stuff\n  * just one more", commits[2].message);
+        assert.equal("Merge branch 'site'", commits[2].short_message);
+        
+        // Restore the rev_list function
+        Git.prototype.rev_list = back;
+        finished();        
+      })   
+    });
+  },
   
   "Should correctly retrieve the commit":function(assert, finished) {
     // new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
