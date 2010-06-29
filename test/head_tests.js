@@ -7,6 +7,7 @@ var TestSuite = require('async_testing').TestSuite,
   Ref = require('git/ref').Ref,
   Head = require('git/head').Head,
   Blob = require('git/blob').Blob,
+  Submodule = require('git/sub_module').Submodule,
   Tree = require('git/tree').Tree,
   Git = require('git/git').Git,
   Commit = require('git/commit').Commit,
@@ -33,8 +34,12 @@ var create_tmp_directory = function(clone_path, callback) {
   });
 }
 
-var fixture = function(name) {
-  return fs.readFileSync("./test/fixtures/" + name, 'ascii');
+var fixture = function(name, trim) {
+  if(trim) {
+    return fs.readFileSync("./test/fixtures/" + name, 'ascii').trim();
+  } else {
+    return fs.readFileSync("./test/fixtures/" + name, 'ascii');
+  }
 }
 
 var destroy_directory = function(directory, callback) {
@@ -217,38 +222,52 @@ suite.addTests({
     });
   },
   
-  // -------------------------------------- PASSING END  
+  // commit count
+  "Should correctly retrieve the commit count":function(assert, finished) {
+    // Save function we are mocking
+    var back = Git.prototype.rev_list;
+    // Repace mocked function
+    Git.prototype.rev_list = function(options, string, callback) { 
+      if(string == "master") {
+        callback(null, fixture('rev_list_count'));         
+      } else {
+        back(options, string, callback);
+      }
+    };
+    
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      repo.commit_count('master', function(err, count) {
+        assert.equal(655, count);
+  
+        // Restore the rev_list function
+        Git.prototype.rev_list = back;
+        finished();        
+      });
+    });
+  },
+  
+  
+  // tree
+  "Should correctly retrieve the repo tree":function(assert, finished) {
+    // Save function we are mocking
+    var back = Git.prototype.ls_tree;
+    Git.prototype.ls_tree = function(options, treeish, paths, callback) { callback(null, fixture('ls_tree_a', true)); };    
+    
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      repo.tree('master', function(err, tree) {
+        var entries_1 = tree.contents.filter(function(entry) { return entry instanceof Blob; })
+        var entries_2 = tree.contents.filter(function(entry) { return entry instanceof Tree; })
+        assert.equal(4, entries_1.length);
+        assert.equal(3, entries_2.length);
+        // Restore the rev_list function
+        Git.prototype.ls_tree = back;
+        finished();        
+      });
+    });
+  },
 
-  // // commit count
-  // "Should correctly retrieve the commit count":function(assert, finished) {
-  //   // new Repo("./..", {is_bare:true}, function(err, repo) {
-  //   //   repo.commit('634396b2f541a9f2d58b00be1a07f0c358b999b3', function(err, commit) {
-  //   //     sys.puts("================= err: " + err)
-  //   //     sys.puts("================= commit: " + sys.inspect(commit))
-  //   //     
-  //   //     assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', commit.id);
-  //   //     finished();
-  //   //   })      
-  //   // });    
-  //   finished();
-  // }
-  // 
-  // // tree
-  // "Should correctly retrieve the repo tree":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   Git.prototype.ls_tree = function() { return fixture('ls_tree_a')};    
-  //   
-  //   repo.tree('master', function(err, tree) {
-  //     tree.contents(function(err, entries) {
-  //       var entries_1 = entries.filter(function(entry) { return entry instanceof Blob; })
-  //       var entries_2 = entries.filter(function(entry) { return entry instanceof Tree; })
-  //       assert.equals(4, entries_1.length);
-  //       assert.equals(3, entries_2.length);
-  //       finished();
-  //     });
-  //   });
-  // },
-  // 
+  // -------------------------------------- PASSING END    
+  
   // // blob
   // "Should correctly fetch blog instance":function(assert, finished) {
   //   var repo = new Repo("./..", {is_bare:true});
