@@ -1,7 +1,7 @@
 require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/lib", "./external-libs/node-xml/lib",
   "./external-libs/node-async-testing");
 
-var TestSuite = require('async_testing').TestSuite,
+TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   Repo = require('git/repo').Repo,
   Ref = require('git/ref').Ref,
@@ -259,36 +259,69 @@ suite.addTests({
         var entries_2 = tree.contents.filter(function(entry) { return entry instanceof Tree; })
         assert.equal(4, entries_1.length);
         assert.equal(3, entries_2.length);
-        // Restore the rev_list function
+        // Restore the ls_tree function
         Git.prototype.ls_tree = back;
         finished();        
       });
     });
   },
+  
+  
+  // blob
+  "Should correctly fetch blog instance":function(assert, finished) {
+    // Save function we are mocking
+    var back = Git.prototype.cat_file;
+    Git.prototype.cat_file = function(type, ref, callback) { 
+      // sys.puts("============================================================= cat_file")
+      
+      callback(null, fixture('cat_file_blob')); 
+    };    
+  
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      repo.blob("abc", function(err, blob) {
+        blob.data(function(err, data) {
+          assert.equal("Hello world", data);          
+  
+          // Restore the cat_file function
+          Git.prototype.cat_file = back;
+          finished();
+        });
+      })          
+    });    
+  },
+  
+  
+  // init_bare
+  "Should correctly init bare":function(assert, finished) {
+    var back_fs_mkdir = GitFileOperations.fs_mkdir;    
+    GitFileOperations.fs_mkdir = function(path, callback) { 
+      callback(null, true); 
+    }    
+
+    var back_init = Git.prototype.init;
+    Git.prototype.init = function(path, callback) { 
+      assert.equal('/foo/bar.git', path)
+      callback(null, true)
+    }
+
+    // Override file system behaviour to return a "valid git" repo
+    var old_real_path_sync = fs.realpathSync;
+    fs.realpathSync = function(path) {
+      return "./test/..";
+    }
+    
+    // Override the create function    
+    Repo.init_bare("/foo/bar.git", function(err, result) {
+      // Reset the overriden functions
+      Git.prototype.init = back_init;
+      GitFileOperations.fs_mkdir = back_fs_mkdir;      
+      fs.realpathSync = fs.realpathSync;
+      finished();
+    })
+  },
 
   // -------------------------------------- PASSING END    
   
-  // // blob
-  // "Should correctly fetch blog instance":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   Git.prototype.cat_file = function() { return fixture('cat_file_blob')};    
-  //   
-  //   repo.blob("abc", function(err, blob) {
-  //     assert.equals("Hello world", blob.data);
-  //     finished();
-  //   })    
-  // },
-  // 
-  // // init_bare
-  // "Should correctly init bare":function(assert, finished) {
-  //   GitFileOperations.prototype.mkdir_p = function() { return null; }
-  //   Git.prototype.init = function() { return true; }
-  //   
-  //   Repo.init_bare("/foo/bar.git", function(err, result) {
-  //     finished();
-  //   })
-  // },
-  // 
   // "Should correctly init bare with options":function(assert, finished) {
   //   GitFileOperations.prototype.mkdir_p = function() { return null; }    
   //   Git.prototype.init = function() { return true; }
