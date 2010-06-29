@@ -319,23 +319,20 @@ suite.addTests({
       finished();
     })
   },
-
+  
   "Should correctly init bare with options":function(assert, finished) {
-    GitFileOperations.prototype.mkdir_p = function() { return null; }    
-    Git.prototype.init = function() { return true; }
-    
     var back_fs_mkdir = GitFileOperations.fs_mkdir;    
     GitFileOperations.fs_mkdir = function(path, callback) { 
       callback(null, true); 
     }    
-
+  
     var back_init = Git.prototype.init;
     Git.prototype.init = function(options, callback) { 
       assert.equal(true, options.bare)
       assert.equal('/baz/sweet', options.template)
       callback(null, true)
     }
-
+  
     // Override file system behaviour to return a "valid git" repo
     var old_real_path_sync = fs.realpathSync;
     fs.realpathSync = function(path) {
@@ -352,19 +349,39 @@ suite.addTests({
     })      
   },
   
+  
+  // fork_bare
+  "Should correctly fork_bare":function(assert, finished) {
+    var back_fs_mkdir = GitFileOperations.fs_mkdir;    
+    GitFileOperations.fs_mkdir = function(path, callback) { 
+      callback(null, true); 
+    };  
+    
+    var back_clone = Git.prototype.clone;
+    Git.prototype.clone = function(options, original_path, target_path, callback) { 
+      callback(null, null)
+    };
+    
+    // Override file system behaviour to return a "valid git" repo
+    var old_real_path_sync = fs.realpathSync;
+    fs.realpathSync = function(path) {
+      return "./test/..";
+    }    
+    
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      repo.fork_bare('/foo/bar.git', {template:'/awesome'}, function(err, result) {
+        assert.equal(null, err);
+        // Restore functions
+        GitFileOperations.fs_mkdir = back_fs_mkdir;
+        Git.prototype.clone = back_clone;
+        fs.realpathSync = fs.realpathSync;
+        finished();
+      });
+    });
+  },
+
   // -------------------------------------- PASSING END    
   
-  // // fork_bare
-  // "Should correctly fork_bare":function(assert, finished) {
-  //   GitFileOperations.prototype.mkdir_p = function() { return null; }    
-  //   Git.prototype.clone = function() { return null; }
-  //   
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   repo.fork_bare('/foo/bar.git', {template:'/awesome'}, function(err result) {
-  //     finished();
-  //   })    
-  // },
-  // 
   // // diff
   // "Should correctly do a diff between two entries":function(assert, finished) {
   //   var repo = new Repo("./..", {is_bare:true});
