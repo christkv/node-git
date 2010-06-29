@@ -297,13 +297,13 @@ suite.addTests({
     GitFileOperations.fs_mkdir = function(path, callback) { 
       callback(null, true); 
     }    
-
+  
     var back_init = Git.prototype.init;
-    Git.prototype.init = function(path, callback) { 
-      assert.equal('/foo/bar.git', path)
+    Git.prototype.init = function(options, callback) { 
+      assert.equal(true, options.bare)
       callback(null, true)
     }
-
+  
     // Override file system behaviour to return a "valid git" repo
     var old_real_path_sync = fs.realpathSync;
     fs.realpathSync = function(path) {
@@ -320,17 +320,40 @@ suite.addTests({
     })
   },
 
+  "Should correctly init bare with options":function(assert, finished) {
+    GitFileOperations.prototype.mkdir_p = function() { return null; }    
+    Git.prototype.init = function() { return true; }
+    
+    var back_fs_mkdir = GitFileOperations.fs_mkdir;    
+    GitFileOperations.fs_mkdir = function(path, callback) { 
+      callback(null, true); 
+    }    
+
+    var back_init = Git.prototype.init;
+    Git.prototype.init = function(options, callback) { 
+      assert.equal(true, options.bare)
+      assert.equal('/baz/sweet', options.template)
+      callback(null, true)
+    }
+
+    // Override file system behaviour to return a "valid git" repo
+    var old_real_path_sync = fs.realpathSync;
+    fs.realpathSync = function(path) {
+      return "./test/..";
+    }
+    
+    // Override the create function    
+    Repo.init_bare("/foo/bar.git", {template:'/baz/sweet'}, function(err, result) {
+      // Reset the overriden functions
+      Git.prototype.init = back_init;
+      GitFileOperations.fs_mkdir = back_fs_mkdir;      
+      fs.realpathSync = fs.realpathSync;
+      finished();
+    })      
+  },
+  
   // -------------------------------------- PASSING END    
   
-  // "Should correctly init bare with options":function(assert, finished) {
-  //   GitFileOperations.prototype.mkdir_p = function() { return null; }    
-  //   Git.prototype.init = function() { return true; }
-  //   
-  //   Repo.init_bare('/foo/bar.git', {template:'/baz/sweet'}, function(err, result) {
-  //     finished();
-  //   });
-  // },
-  // 
   // // fork_bare
   // "Should correctly fork_bare":function(assert, finished) {
   //   GitFileOperations.prototype.mkdir_p = function() { return null; }    
