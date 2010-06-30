@@ -268,16 +268,14 @@ suite.addTests({
   
   
   // blob
-  "Should correctly fetch blog instance":function(assert, finished) {
-    // Save function we are mocking
-    var back = Git.prototype.cat_file;
-    Git.prototype.cat_file = function(type, ref, callback) { 
-      // sys.puts("============================================================= cat_file")
-      
-      callback(null, fixture('cat_file_blob')); 
-    };    
-  
+  "Should correctly fetch blog instance":function(assert, finished) {  
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      // Save function we are mocking
+      var back = Git.prototype.cat_file;
+      Git.prototype.cat_file = function(type, ref, callback) { 
+        callback(null, fixture('cat_file_blob')); 
+      };    
+
       repo.blob("abc", function(err, blob) {
         blob.data(function(err, data) {
           assert.equal("Hello world", data);          
@@ -293,138 +291,156 @@ suite.addTests({
   
   // init_bare
   "Should correctly init bare":function(assert, finished) {
-    var back_fs_mkdir = GitFileOperations.fs_mkdir;    
-    GitFileOperations.fs_mkdir = function(path, callback) { 
-      callback(null, true); 
-    }    
-  
-    var back_init = Git.prototype.init;
-    Git.prototype.init = function(options, callback) { 
-      assert.equal(true, options.bare)
-      callback(null, true)
-    }
-  
-    // Override file system behaviour to return a "valid git" repo
-    var old_real_path_sync = fs.realpathSync;
-    fs.realpathSync = function(path) {
-      return "./test/..";
-    }
-    
     // Override the create function    
     Repo.init_bare("/foo/bar.git", function(err, result) {
+      var back_fs_mkdir = GitFileOperations.fs_mkdir;    
+      GitFileOperations.fs_mkdir = function(path, callback) { 
+        callback(null, true); 
+      }    
+
+      var back_init = Git.prototype.init;
+      Git.prototype.init = function(options, callback) { 
+        assert.equal(true, options.bare)
+        callback(null, true)
+      }
+
+      // Override file system behaviour to return a "valid git" repo
+      var old_real_path_sync = fs.realpathSync;
+      fs.realpathSync = function(path) {
+        return "./test/..";
+      }
+
+
       // Reset the overriden functions
       Git.prototype.init = back_init;
       GitFileOperations.fs_mkdir = back_fs_mkdir;      
-      fs.realpathSync = fs.realpathSync;
+      fs.realpathSync = old_real_path_sync;
       finished();
     })
   },
   
-  "Should correctly init bare with options":function(assert, finished) {
-    var back_fs_mkdir = GitFileOperations.fs_mkdir;    
-    GitFileOperations.fs_mkdir = function(path, callback) { 
-      callback(null, true); 
-    }    
-  
-    var back_init = Git.prototype.init;
-    Git.prototype.init = function(options, callback) { 
-      assert.equal(true, options.bare)
-      assert.equal('/baz/sweet', options.template)
-      callback(null, true)
-    }
-  
-    // Override file system behaviour to return a "valid git" repo
-    var old_real_path_sync = fs.realpathSync;
-    fs.realpathSync = function(path) {
-      return "./test/..";
-    }
-    
+  "Should correctly init bare with options":function(assert, finished) {    
     // Override the create function    
     Repo.init_bare("/foo/bar.git", {template:'/baz/sweet'}, function(err, result) {
+      var back_fs_mkdir = GitFileOperations.fs_mkdir;    
+      GitFileOperations.fs_mkdir = function(path, callback) { 
+        callback(null, true); 
+      }    
+
+      var back_init = Git.prototype.init;
+      Git.prototype.init = function(options, callback) { 
+        assert.equal(true, options.bare)
+        assert.equal('/baz/sweet', options.template)
+        callback(null, true)
+      }
+
+      // Override file system behaviour to return a "valid git" repo
+      var old_real_path_sync = fs.realpathSync;
+      fs.realpathSync = function(path) {
+        return "./test/..";
+      }
+
       // Reset the overriden functions
       Git.prototype.init = back_init;
-      GitFileOperations.fs_mkdir = back_fs_mkdir;      
-      fs.realpathSync = fs.realpathSync;
+      GitFileOperations.fs_mkdir = back_fs_mkdir;     
+      fs.realpathSync = old_real_path_sync;
       finished();
     })      
-  },
-  
+  },  
   
   // fork_bare
-  "Should correctly fork_bare":function(assert, finished) {
-    var back_fs_mkdir = GitFileOperations.fs_mkdir;    
-    GitFileOperations.fs_mkdir = function(path, callback) { 
-      callback(null, true); 
-    };  
-    
-    var back_clone = Git.prototype.clone;
-    Git.prototype.clone = function(options, original_path, target_path, callback) { 
-      callback(null, null)
-    };
-    
-    // Override file system behaviour to return a "valid git" repo
-    var old_real_path_sync = fs.realpathSync;
-    fs.realpathSync = function(path) {
-      return "./test/..";
-    }    
-    
+  "Should correctly fork_bare":function(assert, finished) {            
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      var back_clone = Git.prototype.clone;
+      Git.prototype.clone = function(options, original_path, target_path, callback) { 
+        callback(null, null)
+      };
+
+      // Override file system behaviour to return a "valid git" repo
+      var old_real_path_sync = fs.realpathSync;
+      fs.realpathSync = function(path) {
+        return "./test/..";
+      }    
+
+      var back_fs_mkdir = GitFileOperations.fs_mkdir;    
+      GitFileOperations.fs_mkdir = function(path, callback) { 
+        callback(null, true); 
+      };  
+
       repo.fork_bare('/foo/bar.git', {template:'/awesome'}, function(err, result) {
         assert.equal(null, err);
         // Restore functions
         GitFileOperations.fs_mkdir = back_fs_mkdir;
         Git.prototype.clone = back_clone;
-        fs.realpathSync = fs.realpathSync;
+        fs.realpathSync = old_real_path_sync;
         finished();
       });
     });
   },
 
+  // diff
+  "Should correctly do a diff between two entries":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+      var back_diff = Git.prototype.diff;
+      
+      Git.prototype.diff = function(a, b, c, d, e, callback) { 
+          assert.deepEqual({}, a);
+          assert.equal('master^', b);
+          assert.equal('master', c);
+          assert.equal('--', d);
+        }
+      repo.diff('master^', 'master', function(err, result) {});
+  
+      Git.prototype.diff = function(a, b, c, d, e, callback) { 
+          assert.deepEqual({}, a);
+          assert.equal('master^', b);
+          assert.equal('master', c);
+          assert.equal('--', d);
+          assert.equal('foo/bar', e);
+        }
+      repo.diff('master^', 'master', ['foo/bar'], function(err, result) {});
+  
+      Git.prototype.diff = function(a, b, c, d, e, f) { 
+          assert.deepEqual({}, a);
+          assert.equal('master^', b);
+          assert.equal('master', c);
+          assert.equal('--', d);
+          assert.deepEqual(['foo/bar', 'foo/baz'], e);
+        }
+      repo.diff('master^', 'master', ['foo/bar', 'foo/baz'], function(err, result) {});    
+      
+      // Restore functions
+      Git.prototype.diff = back_diff;
+      finished();
+    });
+  },
+  
   // -------------------------------------- PASSING END    
   
-  // // diff
-  // "Should correctly do a diff between two entries":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  // 
-  //   Git.prototype.diff = function(a, b, c, d) { 
-  //       assert.deepEqual({}, a);
-  //       assert.equals('master^', b);
-  //       assert.equals('master', c);
-  //       assert.equals('--', d);
-  //     }
-  //   repo.diff('master^', 'master', function(err, result) {});
-  // 
-  //   Git.prototype.diff = function(a, b, c, d, e) { 
-  //       assert.deepEqual({}, a);
-  //       assert.equals('master^', b);
-  //       assert.equals('master', c);
-  //       assert.equals('--', d);
-  //       assert.equals('foo/bar', e);
-  //     }
-  //   repo.diff('master^', 'master', 'foo/bar', function(err, result) {});
-  // 
-  //   Git.prototype.diff = function(a, b, c, d, e, f) { 
-  //       assert.deepEqual({}, a);
-  //       assert.equals('master^', b);
-  //       assert.equals('master', c);
-  //       assert.equals('--', d);
-  //       assert.equals('foo/bar', e);
-  //       assert.equals('foo/baz', f);
-  //     }
-  //   repo.diff('master^', 'master', 'foo/bar', 'foo/baz', function(err, result) {});    
-  //   finished();
-  // },
-  // 
-  // // commit_diff
-  // "Should correctly do a commit diff":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});    
-  //   Git.prototype.diff = function() { returns fixture('diff_p'); }
-  // 
-  //   repo.commit_diff('master', function(err, diffs) {
-  //     assert.equals(15, diffs.length);
-  //   });
-  // },
-  // 
+  
+  // commit_diff
+  "Should correctly do a commit diff":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+      var back_diff = Git.prototype.diff;
+
+      Git.prototype.diff = function() { 
+        var self = this;
+        var args = Array.prototype.slice.call(arguments, 0);
+        // Pop the callback
+        var callback = args.pop();
+        callback(null, fixture('diff_p', true));
+      }
+
+      repo.commit_diff('master', function(err, diffs) {
+        assert.equal(15, diffs.length);
+
+        // Restore functions
+        Git.prototype.diff = back_diff;
+        finished();
+      });
+    });
+  },
+  
   // // alternates
   // "Should correctly locate alternates":function(assert, finished) {
   //   var repo = new Repo("./..", {is_bare:true});
