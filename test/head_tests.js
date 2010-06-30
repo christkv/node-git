@@ -414,10 +414,7 @@ suite.addTests({
       finished();
     });
   },
-  
-  // -------------------------------------- PASSING END    
-  
-  
+    
   // commit_diff
   "Should correctly do a commit diff":function(assert, finished) {
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
@@ -440,89 +437,145 @@ suite.addTests({
       });
     });
   },
+    
+  // alternates
+  "Should correctly locate alternates":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+      var back_exists = GitFileOperations.fs_exist;
+      var back_read = GitFileOperations.fs_read;
+      
+      GitFileOperations.fs_exist
+      
+      GitFileOperations.fs_exist = function(dir, path, callback) {         
+        assert.ok(dir != null);
+        assert.ok(path.match(/objects\/info\/alternates/));
+        callback(null, true); }        
+      GitFileOperations.fs_read = function(dir, path, callback) { 
+        assert.ok(dir != null);
+        assert.ok(path.match(/objects\/info\/alternates/));
+        callback(null, '/path/to/repo1/.git/objects\n/path/to/repo2.git/objects\n'); }
   
-  // // alternates
-  // "Should correctly locate alternates":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   GitFileOperations.prototype.exists = function(path) { 
-  //     assert.equals('../.git/objects/info/alternates', path);
-  //     return true; }        
-  //   GitFileOperations.prototype.read = function(path) { 
-  //     assert.equals('../.git/objects/info/alternates', path);
-  //     return '/path/to/repo1/.git/objects\n/path/to/repo2.git/objects\n'; }
-  // 
-  //   repo.alternates(function(err, alternates) {
-  //     assert.deepEqual(["/path/to/repo1/.git/objects", "/path/to/repo2.git/objects"], alternates);
-  //     finished();
-  //   })    
-  // },
-  // 
-  // "Should fail to retrieve alternates":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   GitFileOperations.prototype.exists = function(path) { return false; }
-  //   repo.alternates(function(err, alternates) {
-  //     assert.deepEqual([], alternates);
-  //     finished();
-  //   });
-  // },
-  // 
-  // // set alternates
-  // "Should correctly set alternates":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   var alts = {"/path/to/repo.git/objects":1, "/path/to/repo2.git/objects":1};
-  //   var alts_array = ["/path/to/repo.git/objects", "/path/to/repo2.git/objects"];
-  // 
-  //   GitFileOperations.prototype.exists = function(path) { 
-  //     assert.ok(!alts[path]);
-  //     return true; }
-  //     
-  //   GitFileOperations.prototype.write = function() { return alts_array.join("\n"); }
-  //   
-  //   repo.set_alternates(alts_array, function(err, result) {
-  //     assert.ok(!err);
-  //     finished();
-  //   });   
-  // },
-  // 
-  // "Should fail to set alternates":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  //   var alts = {"/path/to/repo.git/objects":1};
-  //   var alts_array = ["/path/to/repo.git/objects"];
-  //   
-  //   GitFileOperations.prototype.exists = function(path) { 
-  //     assert.ok(!alts[path]);
-  //     return true; }
-  // 
-  //   repo.set_alternates(alts_array, function(err, result) {
-  //     assert.ok(err);
-  //     finished();
-  //   });       
-  // },
-  // 
-  // "Should set empty alternates":function(assert, finished) {
-  //   GitFileOperations.prototype.write = function() { return true; }
-  //   repo.set_alternates([], function(err, result) {
-  //     assert.ok(!err);
-  //     finished();
-  //   });    
-  // },
-  // 
-  // // log
-  // "Should correctly test log":function(assert, finished) {
-  //   var repo = new Repo("./..", {is_bare:true});
-  // 
-  //   Git.prototype.log = function(a, b) { 
-  //     assert.deepEqual({pretty:'raw'}, a);
-  //     assert.equals('master', b);
-  //     return fixture('rev_list'); }
-  //   
-  //   repo.log(function(err, log_items) {
-  //     assert.equals('4c8124ffcf4039d292442eeccabdeca5af5c5017', log_items[0].id);
-  //     assert.equals('ab25fd8483882c3bda8a458ad2965d2248654335', log_items[log_items.length - 1].id);
-  //     finished();
-  //   });    
-  // },
-  // 
+      repo.alternates(function(err, alternates) {
+        assert.deepEqual(["/path/to/repo1/.git/objects", "/path/to/repo2.git/objects"], alternates);
+        
+        // Restore functions
+        GitFileOperations.exist = back_exists;
+        GitFileOperations.read = back_read;
+        finished();
+      })
+    });
+  },
+  
+  "Should fail to retrieve alternates":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+      var back_exists = GitFileOperations.fs_exist;
+
+      GitFileOperations.fs_exist = function(dir, path, callback) {         
+        assert.ok(dir != null);
+        assert.ok(path.match(/objects\/info\/alternates/));
+        callback(null, false); }        
+
+      repo.alternates(function(err, alternates) {
+        assert.deepEqual([], alternates);
+
+        // Restore functions
+        GitFileOperations.exist = back_exists;
+        finished();
+      });
+    });
+  },
+  
+  // set alternates
+  "Should correctly set alternates":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+      var alts = {"/path/to/repo.git/objects":1, "/path/to/repo2.git/objects":1};
+      var alts_array = ["/path/to/repo.git/objects", "/path/to/repo2.git/objects"];
+
+      var back_exists = GitFileOperations.fs_exist;
+      var back_write = GitFileOperations.fs_write;
+  
+      GitFileOperations.fs_exist = function(dir, path, callback) {
+        assert.ok(dir != null);
+        assert.ok(alts[path]);
+        callback(null, true);
+      }
+
+      GitFileOperations.fs_write = function(dir, path, content, callback) { 
+        assert.ok(dir != null);
+        callback(null, true); 
+      }
+    
+      repo.set_alternates(alts_array, function(err, result) {
+        assert.ok(!err);
+        
+        // Restore functions
+        GitFileOperations.fs_exist = back_exists;
+        GitFileOperations.fs_write = back_write;
+        finished();
+      });
+    });
+  },
+  
+  "Should fail to set alternates":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      var alts = {"/path/to/repo.git/objects":1};
+      var alts_array = ["/path/to/repo.git/objects"];
+
+      var back_exists = GitFileOperations.fs_exist;
+    
+      GitFileOperations.fs_exist = function(dir, path, callback) {
+        assert.ok(dir != null);
+        assert.ok(alts[path]);
+        callback(null, false);
+      }
+    
+      repo.set_alternates(alts_array, function(err, result) {
+        assert.ok(err);
+        // Restore functions
+        GitFileOperations.fs_exist = back_exists;
+        finished();
+      });
+    });
+  },
+
+  "Should set empty alternates":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      var back_write = GitFileOperations.fs_write;
+
+      GitFileOperations.fs_write = function(dir, path, content, callback) { 
+        assert.ok(dir != null);
+        callback(null, true); 
+      }
+      
+      repo.set_alternates([], function(err, result) {
+        assert.ok(!err);
+
+        // Restore functions
+        GitFileOperations.fs_write = back_write;
+        finished();
+      });    
+    });
+  },
+  
+  // -------------------------------------- PASSING END    
+    
+  // log
+  "Should correctly test log":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      Git.prototype.log = function(a, b, callback) {
+        assert.deepEqual({pretty:'raw'}, a);
+        assert.equal('master', b);
+        callback(null, fixture('rev_list')); 
+      }
+    
+      repo.log(function(err, log_items) {
+        assert.equal('4c8124ffcf4039d292442eeccabdeca5af5c5017', log_items[0].id);
+        assert.equal('ab25fd8483882c3bda8a458ad2965d2248654335', log_items[log_items.length - 1].id);
+        finished();
+      });
+    });
+  },
+  
   // "Should test log with path and options":function(assert, finished) {
   //   var repo = new Repo("./..", {is_bare:true});
   // 
