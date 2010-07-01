@@ -6,6 +6,8 @@ TestSuite = require('async_testing').TestSuite,
   Repo = require('git/repo').Repo,
   Ref = require('git/ref').Ref,
   Head = require('git/head').Head,
+  Tag = require('git/tag').Tag,
+  Remote = require('git/remote').Remote,
   Blob = require('git/blob').Blob,
   Submodule = require('git/sub_module').Submodule,
   Tree = require('git/tree').Tree,
@@ -24,8 +26,6 @@ var create_tmp_directory = function(clone_path, callback) {
   fs.mkdirSync(tmp_path, 0777);
   // Copy the old directory to the new one
   var child = exec('cp -R ' + clone_path + ' ' + tmp_path, function (error, stdout, stderr) {
-      sys.print('stdout: ' + stdout);
-      sys.print('stderr: ' + stderr);
       if (error !== null) {
         sys.puts('exec error: ' + error);
         return callback(error, null);
@@ -45,8 +45,6 @@ var fixture = function(name, trim) {
 var destroy_directory = function(directory, callback) {
   // Copy the old directory to the new one
   var child = exec('rm -rf ' + directory, function (error, stdout, stderr) {
-      sys.print('stdout: ' + stdout);
-      sys.print('stderr: ' + stderr);
       if (error !== null) {
         sys.puts('exec error: ' + error);
         return callback(error, null);
@@ -59,77 +57,81 @@ var destroy_directory = function(directory, callback) {
   Test basic node-git functionality
 **/
 suite.addTests({
-  // "Should update refs packed":function(assert, finished) {
-  //   create_tmp_directory("./test/dot_git", function(err, target_path) {
-  //     var repo = new Repo(target_path, {is_bare:true});
-  //     
-  //     // new and existing
-  //     var test   = 'ac9a30f5a7f0f163bbe3b6f0abf18a6c83b06872'
-  //     var master = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a'
-  //     
-  //     repo.update_ref('testref', test, function(err, result) {
-  //       repo.get_head('testref', function(err, head) {
-  //         assert.ok(head.commit.sha != master);
-  // 
-  //         repo.update_ref('testref', test, function(err, result) {
-  //           repo.get_head('testref', function(err, head) {
-  //             assert.ok(head.commit.sha != master)
-  //           })
-  //         })
-  //       })
-  //     });
-  //     
-  //     repo.get_head('nonpack', function(err, head) {
-  //       var old = head.commit.sha;
-  //       repo.update_ref('nonpack', test, function(err, result) {
-  //         assert.ok(result.commit.sha != old);
-  // 
-  //         destroy_directory(target_path, function(err, result) {
-  //           finished();        
-  //         })
-  //       })
-  //     })      
-  //   });    
-  // },
-  // 
-  // "Should raise error on invalid repo location":function(assert, finished) {
-  //   try {
-  //     var repo = new Repo('/tmp');
-  //   } catch(err) {
-  //     finished();
-  //   }
-  // },
-  // 
-  // "Should raise error on non existing path":function(assert, finished) {
-  //   try {
-  //     var repo = new Repo('/foobar');
-  //   } catch(err) {
-  //     finished();
-  //   }
-  // },
-  // 
-  // // Description
-  // "Should correctly retrieve the description":function(assert, finished) {
-  //   var repo = new Repo("./..");
-  //   repo.description(function(err, description) {
-  //     assert.ok(description.indexOf("Unnamed repository; edit this file") != -1);
-  //     finished();
-  //   })
-  // },
-  // 
-  // // Refs
-  // "Should correctly return array of ref objects":function(assert, finished) {
-  //   var repo = new Repo("./..");
-  //   repo.refs(function(err, refs) {
-  //     refs.forEach(function(ref) {
-  //       assert.ok(ref instanceof Ref);
-  //     })
-  //     
-  //     finished();
-  //   })    
-  // },
+  "Should update refs packed":function(assert, finished) {
+    var a = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git"
+    
+    // create_tmp_directory("./test/dot_git", function(err, target_path) {
+    create_tmp_directory(a, function(err, target_path) {
+      new Repo(target_path, {is_bare:true}, function(err, repo) {
+        // new and existing
+        var test   = 'ac9a30f5a7f0f163bbe3b6f0abf18a6c83b06872'
+        var master = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a'
   
-  // -------------------------------------- PASSING
+        repo.update_ref('testref', test, function(err, result) {          
+          repo.get_head('testref', function(err, testref_head) {
+            assert.ok(testref_head.commit.sha != master);
+        
+            repo.update_ref('master', test, function(err, result) {
+              repo.get_head('testref', function(err, master_head) {
+                assert.ok(master_head.commit.sha != master)
+        
+                // Test nonpack
+                repo.get_head('nonpack', function(err, nonpack_head) {
+                  repo.update_ref('nonpack', test, function(err, result) {
+                
+                    repo.get_head('nonpack', function(err, nonpack_head_2) {
+                      assert.ok(nonpack_head_2.commit.sha != nonpack_head.commit.sha);
+                
+                      destroy_directory(target_path, function(err, result) {
+                        finished();        
+                      })
+                    });            
+                  })
+                })      
+              })
+            })
+          })
+        });  
+      });      
+    });    
+  },
+  
+  "Should raise error on invalid repo location":function(assert, finished) {
+    new Repo('/tmp', function(err, repo) {
+      assert.equal("invalid git repository", err);
+      finished();
+    });
+  },
+  
+  "Should raise error on non existing path":function(assert, finished) {
+    new Repo('/foobar', function(err, repo) {
+      assert.equal("no such path", err);
+      finished();
+    });
+  },
+  
+  // Description
+  "Should correctly retrieve the description":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      repo.description(function(err, description) {
+        assert.ok(description.indexOf("Unnamed repository; edit this file") != -1);
+        finished();
+      });
+    });
+  },
+  
+  // Refs
+  "Should correctly return array of ref objects":function(assert, finished) {
+    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+      repo.refs(function(err, refs) {
+        refs.forEach(function(ref) {
+          assert.ok(ref instanceof Remote || ref instanceof Tag || ref instanceof Head);
+        })
+      
+        finished();
+      });
+    });
+  },
   
   // Heads
   "Should correctly return the current head":function(assert, finished) {
@@ -213,7 +215,6 @@ suite.addTests({
   },
   
   "Should correctly retrieve the commit":function(assert, finished) {
-    // new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
       repo.commit('634396b2f541a9f2d58b00be1a07f0c358b999b3', function(err, commit) {
         assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', commit.id);
@@ -245,8 +246,7 @@ suite.addTests({
       });
     });
   },
-  
-  
+    
   // tree
   "Should correctly retrieve the repo tree":function(assert, finished) {
     // Save function we are mocking
@@ -265,8 +265,7 @@ suite.addTests({
       });
     });
   },
-  
-  
+    
   // blob
   "Should correctly fetch blog instance":function(assert, finished) {  
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
@@ -287,8 +286,7 @@ suite.addTests({
       })          
     });    
   },
-  
-  
+    
   // init_bare
   "Should correctly init bare":function(assert, finished) {
     // Override the create function    
@@ -521,18 +519,15 @@ suite.addTests({
       var alts = {"/path/to/repo.git/objects":1};
       var alts_array = ["/path/to/repo.git/objects"];
   
-      var back_exists = GitFileOperations.fs_exist;
-    
-      GitFileOperations.fs_exist = function(dir, path, callback) {
-        assert.ok(dir != null);
-        assert.ok(alts[path]);
+      repo.git.fs_exist = function(path, callback) {
+        assert.ok(path != null);
+        assert.ok(alts[path]);        
         callback(null, false);
       }
     
       repo.set_alternates(alts_array, function(err, result) {
         assert.ok(err);
         // Restore functions
-        GitFileOperations.fs_exist = back_exists;
         finished();
       });
     });
@@ -672,8 +667,6 @@ suite.addTests({
     });
   },
   
-  // -------------------------------------- PASSING END    
-      
   // object_exist
   "Should correctly select existing objects":function(assert, finished) {
     // Open the first repo
@@ -682,7 +675,6 @@ suite.addTests({
       var after = ['634396b2f541a9f2d58b00be1a07f0c358b999b3'];
   
       repo.git.select_existing_objects(before, function(err, objects) {
-        sys.puts("========================")
         assert.deepEqual(after, objects);
         finished();
       });
