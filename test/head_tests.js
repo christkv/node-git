@@ -35,11 +35,7 @@ var create_tmp_directory = function(clone_path, callback) {
 }
 
 var fixture = function(name, trim) {
-  if(trim) {
-    return fs.readFileSync("./test/fixtures/" + name, 'ascii').trim();
-  } else {
-    return fs.readFileSync("./test/fixtures/" + name, 'ascii');
-  }
+  return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
 var destroy_directory = function(directory, callback) {

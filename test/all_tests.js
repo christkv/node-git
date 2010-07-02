@@ -4,5 +4,6 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 var sys = require('sys');
 
 // Run all tests
-require('git_tests').suite.runTests(function() {});
-require('head_tests').suite.runTests(function() {});
+// require('git_tests').suite.runTests(function() {});
+// require('head_tests').suite.runTests(function() {});
+require('diff_tests').suite.runTests(function() {});
