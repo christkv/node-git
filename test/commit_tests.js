@@ -168,6 +168,38 @@ suite.addTests({
         finished();
       });
     });        
+  }, 
+  
+  "Test diffs on initial import":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      repo.git.show = function(options, sha, callback) {
+          assert.deepEqual({full_index:true, pretty:'raw'}, options);
+          assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', sha);          
+          callback(null, fixture('diff_i'));
+        }
+        
+      // Fetch the diff
+      var commit = new Commit(repo, '634396b2f541a9f2d58b00be1a07f0c358b999b3');
+      commit.diffs(function(err, diffs) {
+        assert.equal(10, diffs.length);
+        
+        assert.equal('History.txt', diffs[0].a_path);
+        assert.equal('History.txt', diffs[0].b_path);
+        assert.equal(null, diffs[0].a_blob);
+        assert.equal(null, diffs[0].b_mode);
+        assert.equal('81d2c27608b352814cbe979a6acd678d30219678', diffs[0].b_blob.id);
+        assert.equal(false, diffs[0].new_file);
+        assert.equal(false, diffs[0].deleted_file);
+        assert.equal("--- /dev/null\n+++ b/History.txt\n@@ -0,0 +1,5 @@\n+== 1.0.0 / 2007-10-09\n+\n+* 1 major enhancement\n+  * Birthday!\n+", diffs[0].diff);
+        
+        assert.equal('lib/grit.rb', diffs[5].a_path);
+        assert.equal(null, diffs[5].a_blob);
+        assert.equal('32cec87d1e78946a827ddf6a8776be4d81dcf1d1', diffs[5].b_blob.id);
+        assert.equal(true, diffs[5].new_file);        
+        finished();
+      });
+    });        
+    
   }
 });
 
