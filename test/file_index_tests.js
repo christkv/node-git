@@ -22,7 +22,7 @@ suite.addTests({
       })
     });    
   },
-
+  
   "Count for a given sha":function(assert, finished) {
     var commit = "c12f398c2f3c4068ca5e01d736b1c9ae994b2138";
     
@@ -66,6 +66,30 @@ suite.addTests({
         assert.equal('74fd66519e983a0f29e16a342a6059dbffe36020', commits_by_file['lib/grit/git.rb']);
         assert.equal(commit, commits_by_file['lib/grit/commit.rb']);
         assert.equal(null, commits_by_file['lib/grit/actor.rb']);
+        finished();
+      })
+    });    
+  },
+  
+  "Retrieve array of last commits based on regexp pattern":function(assert, finished) {
+    var commit = "c12f398c2f3c4068ca5e01d736b1c9ae994b2138";
+    
+    new FileIndex("./test/dot_git", function(err, file_index) {
+      file_index.last_commits(commit, /lib\/grit\/[^\/]*$/, function(err, commits_by_file) {
+        assert.equal(10, Object.keys(commits_by_file).length);
+        assert.equal(commit, commits_by_file['lib/grit/commit.rb']);
+        assert.equal(null, commits_by_file['lib/grit/actor.rb']);
+        finished();
+      })
+    });        
+  },
+  
+  "Retrieve last commits containing a directory in array":function(assert, finished) {
+    var commit = "c12f398c2f3c4068ca5e01d736b1c9ae994b2138";
+    
+    new FileIndex("./test/dot_git", function(err, file_index) {
+      file_index.last_commits(commit, ['lib/grit.rb', 'lib/grit/'], function(err, commits_by_file) {
+        assert.equal(commit, commits_by_file['lib/grit/']);
         finished();
       })
     });    
