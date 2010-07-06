@@ -175,7 +175,7 @@ suite.addTests({
       repo.git.show = function(options, sha, callback) {
           assert.deepEqual({full_index:true, pretty:'raw'}, options);
           assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', sha);          
-          callback(null, fixture('diff_i'));
+          callback(null, fixture('diff_i', true));
         }
         
       // Fetch the diff
@@ -188,7 +188,7 @@ suite.addTests({
         assert.equal(null, diffs[0].a_blob);
         assert.equal(null, diffs[0].b_mode);
         assert.equal('81d2c27608b352814cbe979a6acd678d30219678', diffs[0].b_blob.id);
-        assert.equal(false, diffs[0].new_file);
+        assert.equal(true, diffs[0].new_file);
         assert.equal(false, diffs[0].deleted_file);
         assert.equal("--- /dev/null\n+++ b/History.txt\n@@ -0,0 +1,5 @@\n+== 1.0.0 / 2007-10-09\n+\n+* 1 major enhancement\n+  * Birthday!\n+", diffs[0].diff);
         
@@ -198,9 +198,74 @@ suite.addTests({
         assert.equal(true, diffs[5].new_file);        
         finished();
       });
-    });        
-    
-  }
+    });            
+  },
+  
+  "Test diffs on initial import with empty commit":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      repo.git.show = function(options, sha, callback) {
+          assert.deepEqual({full_index:true, pretty:'raw'}, options);
+          assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', sha);          
+          callback(null, fixture('show_empty_commit', true));
+        }
+        
+      // Fetch the diff
+      var commit = new Commit(repo, '634396b2f541a9f2d58b00be1a07f0c358b999b3');      
+      commit.diffs(function(err, diffs) {
+        assert.deepEqual([], diffs);
+        finished();
+      });
+    });                
+  },
+  
+  "Test diffs with mode only change":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      repo.git.diff = function(options, sha, callback) {
+          var args = Array.prototype.slice.call(arguments, 0);
+          callback = args.pop();
+          callback(null, fixture('diff_mode_only', true));
+        }
+        
+      // Fetch the diff
+      var commit = new Commit(repo, '91169e1f5fa4de2eaea3f176461f5dc784796769');      
+      commit.diffs(function(err, diffs) {
+        assert.equal(23, diffs.length);
+        assert.equal('100644', diffs[0].a_mode);
+        assert.equal('100755', diffs[0].b_mode);
+        finished();
+      });
+    });    
+  },
+  
+  // to String
+  "Test toString() override for the commit":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      // Fetch the diff
+      var commit = new Commit(repo, 'abc');
+      assert.equal("abc", commit.toString());
+      finished();
+    });
+  },
+  
+  // to patch
+  "Test create patch from commit":function(assert, finished) {
+    new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
+      // Fetch the diff
+      var commit = new Commit(repo, '80f136f500dfdb8c3e8abf4ae716f875f0a1b57f');
+      commit.toPatch(function(err, patch) {
+        // sys.puts(patch)
+        assert.ok(patch.indexOf('From 80f136f500dfdb8c3e8abf4ae716f875f0a1b57f Mon Sep 17 00:00:00 2001') != -1);
+        assert.ok(patch.indexOf('From: tom <tom@taco.(none)>') != -1);
+        assert.ok(patch.indexOf('Date: Tue, 20 Nov 2007 17:27:42 -0800') != -1);
+        assert.ok(patch.indexOf('Subject: [PATCH] fix tests on other machines') != -1);
+        assert.ok(patch.indexOf('test/test_reality.rb |   30 +++++++++++++++---------------') != -1);
+        assert.ok(patch.indexOf('@@ -1,17 +1,17 @@') != -1);
+        assert.ok(patch.indexOf('+#     recurse(t)') != -1);
+        assert.ok(patch.indexOf('1.6.') != -1);
+        finished();
+      });
+    });    
+  },
 });
 
 

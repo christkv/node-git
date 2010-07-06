@@ -2,6 +2,6 @@
 NODE = node
 
 test:
-	@$(NODE) test/all_tests.js
+	@$(NODE) test/test_all.js
 		
 .PHONY: test
