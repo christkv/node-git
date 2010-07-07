@@ -19,7 +19,7 @@ suite.addTests({
     var git = new Git("./test/dot_git");
     var commit = '2d3acf90f35989df8f262dc50beadc4ee3ae1560';
     git.blame_tree(commit, function(err, tree) {
-      var last_commit_sha = tree.index('History.txt');
+      var last_commit_sha = tree['History.txt'];
       assert.equal('7bcc0ee821cdd133d8a53e8e7173a334fef448aa', last_commit_sha);
       finished();
     });      
