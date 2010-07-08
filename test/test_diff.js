@@ -5,7 +5,8 @@ TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   Repo = require('git/repo').Repo,
   fs = require('fs'),
-  Diff = require('git/diff').Diff;
+  Diff = require('git/diff').Diff,
+  Blob = require('git/blob').Blob;
 
 var suite = exports.suite = new TestSuite("diff tests");
 

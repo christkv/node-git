@@ -5,7 +5,8 @@ TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   Repo = require('git/repo').Repo,
   fs = require('fs'),
-  Commit = require('git/commit').Commit;
+  Commit = require('git/commit').Commit,
+  Blob = require('git/blob').Blob;
 
 var suite = exports.suite = new TestSuite("commit tests");
 

@@ -188,8 +188,8 @@ suite.addTests({
         assert.equal('tom@mojombo.com', commit.author.email);
         assert.deepEqual(new Date(1191999972*1000), commit.authored_date);
         
-        assert.equal('Tom Preston-Werner', commit.comitter.name);
-        assert.equal('tom@mojombo.com', commit.comitter.email);
+        assert.equal('Tom Preston-Werner', commit.committer.name);
+        assert.equal('tom@mojombo.com', commit.committer.email);
         assert.deepEqual(new Date(1191999972*1000), commit.committed_date);
         assert.equal('implement Grit#heads', commit.message);
   
@@ -272,13 +272,10 @@ suite.addTests({
       };    
   
       repo.blob("abc", function(err, blob) {
-        blob.data(function(err, data) {
-          assert.equal("Hello world", data);          
-  
-          // Restore the cat_file function
-          Git.prototype.cat_file = back;
-          finished();
-        });
+        assert.equal("Hello world", blob.data);
+        // Restore the cat_file function
+        Git.prototype.cat_file = back;
+        finished();
       })          
     });    
   },
