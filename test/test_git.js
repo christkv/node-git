@@ -11,15 +11,70 @@ var suite = exports.suite = new TestSuite("node-git tests");
   Test basic node-git functionality
 **/
 suite.addTests({
-  "Open a repository correctly": function(assert, finished) {
-    // Basic setup
-    var git = new Git("./dot_git");
-    var commit_sha = '5e3ee1198672257164ce3fe31dea3e40848e68d5'
-    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881'
-    var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce'
+  "Should correctly call native git method":function(assert, finished) {
+    var git = new Git("/Users/christian.kvalheim/coding/checkouts/grit");
+    git.git('version', function(err, result) {
+      assert.ok(!err);
+      assert.ok(result.match(/^git version [\w\.]*/));
+      finished();
+    });
+  },
+  
+  "Should fail to call wrong native method":function(assert, finished) {
+    var git = new Git("/Users/christian.kvalheim/coding/checkouts/grit");
+    git.git('bad', function(err, result) {
+      assert.ok(err);
+      assert.ok(err.indexOf("git: 'bad' is not a git-command") != -1);
+      finished();
+    })
+  }, 
+  
+  "Should fail to call wrong native function with skip timeout":function(assert, finished) {
+    var git = new Git("/Users/christian.kvalheim/coding/checkouts/grit");
+    git.git('bad', {timeout:false}, function(err, result) {
+      assert.ok(err);
+      assert.ok(err.indexOf("git: 'bad' is not a git-command") != -1);
+      finished();
+    })    
+  },
+  
+  "Should correctly transform options":function(assert, finished) {
+    var git = new Git("/Users/christian.kvalheim/coding/checkouts/grit");
+    assert.deepEqual(["-s"], git.transform_options({s:true}));
+    assert.deepEqual([], git.transform_options({s:false}));
+    assert.deepEqual(["-s '5'"], git.transform_options({s:5}));
 
+    assert.deepEqual(["--max-count"], git.transform_options({max_count:true}));
+    assert.deepEqual(["--max-count='5'"], git.transform_options({max_count:5}));
+
+    assert.deepEqual(["-s", "-t"], git.transform_options({s:true, t:true}));
     finished();
+  },
+  
+  "Should correctly escape calls to the git shell":function(assert, finished) {
+    //Git.prototype.exec
+    var git = new Git("/Users/christian.kvalheim/coding/checkouts/grit");
+    git.exec = function(call, options, callback) {
+      assert.equal(Git.git_binary + " --git-dir='/Users/christian.kvalheim/coding/checkouts/grit' foo --bar='bazz\\'er'", call)
+      assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
+      callback(null, null);
+    };
+
+    git.git('foo', {bar:"bazz'er"}, function(err, result) {
+      git.exec = function(call, options, callback) {
+        assert.equal(Git.git_binary + " --git-dir='/Users/christian.kvalheim/coding/checkouts/grit' bar -x 'quu\\'x'", call)
+        assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
+        callback(null, null);
+      };      
+
+      git.git('bar', {x:"quu'x"}, function(err, result) {
+        finished();
+      });
+    });
   }
+  
+  
+  
 });
 
 
