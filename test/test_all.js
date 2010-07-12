@@ -17,3 +17,5 @@ require('test_commit_write').suite.runTests(function() {});
 require('test_config').suite.runTests(function() {});
 require('test_git').suite.runTests(function() {});
 require('test_index_status').suite.runTests(function() {});
+require('test_merge').suite.runTests(function() {});
+require('test_raw').suite.runTests(function() {});
