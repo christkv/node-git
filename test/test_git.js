@@ -43,39 +43,69 @@ suite.addTests({
     assert.deepEqual(["-s"], git.transform_options({s:true}));
     assert.deepEqual([], git.transform_options({s:false}));
     assert.deepEqual(["-s '5'"], git.transform_options({s:5}));
-
+  
     assert.deepEqual(["--max-count"], git.transform_options({max_count:true}));
     assert.deepEqual(["--max-count='5'"], git.transform_options({max_count:5}));
-
+  
     assert.deepEqual(["-s", "-t"], git.transform_options({s:true, t:true}));
     finished();
   },
   
   "Should correctly escape calls to the git shell":function(assert, finished) {
-    //Git.prototype.exec
     var git = new Git("/Users/christian.kvalheim/coding/checkouts/grit");
     git.exec = function(call, options, callback) {
       assert.equal(Git.git_binary + " --git-dir='/Users/christian.kvalheim/coding/checkouts/grit' foo --bar='bazz\\'er'", call)
       assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
       callback(null, null);
     };
-
+  
     git.git('foo', {bar:"bazz'er"}, function(err, result) {
       git.exec = function(call, options, callback) {
         assert.equal(Git.git_binary + " --git-dir='/Users/christian.kvalheim/coding/checkouts/grit' bar -x 'quu\\'x'", call)
         assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
         callback(null, null);
       };      
-
+  
       git.git('bar', {x:"quu'x"}, function(err, result) {
         finished();
       });
     });
+  },
+  
+  "Should correctly escape standalone argument":function(assert, finished) {
+    var git = new Git("/Users/christian.kvalheim/coding/checkouts/grit");
+    git.exec = function(call, options, callback) {
+      assert.equal(Git.git_binary + " --git-dir='/Users/christian.kvalheim/coding/checkouts/grit' foo 'bar\\'s'", call)
+      assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
+      callback(null, null);
+    };
+  
+    git.git('foo', {}, "bar's", function(err, result) {
+      git.exec = function(call, options, callback) {
+        assert.equal(Git.git_binary + " --git-dir='/Users/christian.kvalheim/coding/checkouts/grit' foo 'bar' '\\; echo \\'noooo\\''", call)
+        assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
+        callback(null, null);
+      };      
+  
+      git.git('foo', {}, "bar", "; echo 'noooo'", function(err, result) {
+        finished();
+      });
+    });
   }
-  
-  
-  
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -18,10 +18,9 @@ suite.addTests({
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       var commit = '2d3acf90f35989df8f262dc50beadc4ee3ae1560';
       repo.blame('History.txt', commit, function(err, blame) {
-        assert.ok(!err);
-        
+        assert.ok(!err);        
         assert.equal(5, blame.lines.length);
-  
+          
         var line = blame.lines[2];
         assert.equal('* 1 major enhancement', line.line);
         assert.equal(3, line.lineno);
@@ -39,7 +38,7 @@ suite.addTests({
         assert.ok(!err);
         
         assert.equal(37, blame.lines.length);
-
+  
         var line = blame.lines[24];
         assert.equal("require 'grit/diff'", line.line);
         assert.equal(25, line.lineno);
