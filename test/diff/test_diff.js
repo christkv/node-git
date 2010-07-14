@@ -3,68 +3,77 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
-  Git = require('git/git').Git,
-  fs = require('fs'),
-  Commit = require('git/commit').Commit,
-  Blob = require('git/blob').Blob,
-  GitFileOperations = require('git/git_file_operations').GitFileOperations;
+  Difference = require('diff/diff').Difference;
 
-var suite = exports.suite = new TestSuite("git basic tests");
+var suite = exports.suite = new TestSuite("diff tests");
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
-suite.addTests({  
-  "Should correctly init gitdir":function(assert, finished) {
-    var tmp_path = '/tmp/gitdir';
-    GitFileOperations.fs_rmdir_r(tmp_path, function(err, result) {
-      // Create a temp directory
-      fs.mkdirSync(tmp_path, 16877);
-      // create Git repo
-      var git = new Git(tmp_path);
-      git.init({}, function(err, git) {
-        var stat = fs.statSync(tmp_path + "/config");
-        assert.equal(true, stat.isFile());   
-        finished();
-      });      
-    })
-  },
-  
-  "Should correctly merge logs":function(assert, finished) {
-    var c1 = '420eac97a826bfac8724b6b0eef35c20922124b7';
-    var c2 = '30e367cef2203eba2b341dc9050993b06fd1e108';
-    var git = new Git("./test/dot_git");
+suite.addTests({
+  "Should correctly execute lcs diff":function(assert, finished) {
+    var seq1 = ["a", "b", "c", "e", "h", "j", "l", "m", "n", "p"];
+    var seq2 = ["b", "c", "d", "e", "f", "j", "k", "l", "m", "r", "s", "t"];
+    var correct_lcs = ["b", "c", "e", "j", "l", "m"];
+    var res = ares = bres = null;
     
-    git.rev_list({pretty:'raw', max_count:10}, 'master', function(err, rev_output) {
-      assert.ok(rev_output.match("commit " + c1));
-      assert.ok(rev_output.match("commit " + c2));
-      finished();
-    })
-  },
-  
-  "Should correctly honor max count":function(assert, finished) {
-    var git = new Git("./test/dot_git");
-    git.rev_list({max_count:10}, 'master', function(err, rev_output) {
-      assert.equal(10, rev_output.split(/\n/).length);
-      finished();
-    })    
-  },
-  
-  "Should correctly retrieve the diff between two commits":function(assert, finished) {
-    var commit1 = '2d3acf90f35989df8f262dc50beadc4ee3ae1560';
-    var commit2 = '420eac97a826bfac8724b6b0eef35c20922124b7';
-
-    var git = new Git("./test/dot_git");
-    git.diff(commit1, commit2, function(err, out) {
-      sys.puts(out);
-      finished();
-    });
+    // Execute lcs over two arrays
+    res = Difference.LCS.__lcs(seq1, seq2);
+    // The result of the LCS (less the null values) must be as long as the
+    // correct result.
+    var res_compact = res.filter(function(e) { return e != null;});
+    assert.equal(correct_lcs.length, res_compact.length);
+    finished();
   }
-
-
-  
+  // "Should correctly init gitdir":function(assert, finished) {
+  //   var tmp_path = '/tmp/gitdir';
+  //   GitFileOperations.fs_rmdir_r(tmp_path, function(err, result) {
+  //     // Create a temp directory
+  //     fs.mkdirSync(tmp_path, 16877);
+  //     // create Git repo
+  //     var git = new Git(tmp_path);
+  //     git.init({}, function(err, git) {
+  //       var stat = fs.statSync(tmp_path + "/config");
+  //       assert.equal(true, stat.isFile());   
+  //       finished();
+  //     });      
+  //   })
+  // },
+  // 
+  // "Should correctly merge logs":function(assert, finished) {
+  //   var c1 = '420eac97a826bfac8724b6b0eef35c20922124b7';
+  //   var c2 = '30e367cef2203eba2b341dc9050993b06fd1e108';
+  //   var git = new Git("./test/dot_git");
+  //   
+  //   git.rev_list({pretty:'raw', max_count:10}, 'master', function(err, rev_output) {
+  //     assert.ok(rev_output.match("commit " + c1));
+  //     assert.ok(rev_output.match("commit " + c2));
+  //     finished();
+  //   })
+  // },
+  // 
+  // "Should correctly honor max count":function(assert, finished) {
+  //   var git = new Git("./test/dot_git");
+  //   git.rev_list({max_count:10}, 'master', function(err, rev_output) {
+  //     assert.equal(10, rev_output.split(/\n/).length);
+  //     finished();
+  //   })    
+  // },
+  // 
+  // "Should correctly retrieve the diff between two commits":function(assert, finished) {
+  //   var commit1 = '2d3acf90f35989df8f262dc50beadc4ee3ae1560';
+  //   var commit2 = '420eac97a826bfac8724b6b0eef35c20922124b7';
+  // 
+  //   var git = new Git("./test/dot_git");
+  //   git.diff(commit1, commit2, function(err, out) {
+  //     sys.puts(out);
+  //     finished();
+  //   });
+  // }
+  // 
+  // 
+  // 
   // // __bake__
   // "Test commit bake":function(assert, finished) {
   //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
