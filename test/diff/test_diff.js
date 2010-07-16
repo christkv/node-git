@@ -443,7 +443,7 @@ suite.addTests({
     assert.equal("C00 C11 C22 DA33 ", callback.result);
     finished();
   },
-
+  
   "Should correctly test balanced f":function(assert, finished) {
     var seq1 = ["a", "z"];
     var seq2 = ["a"];
@@ -452,7 +452,7 @@ suite.addTests({
     assert.equal("M00 DA11 ", callback.result);
     finished();
   },
-
+  
   "Should correctly test balanced g":function(assert, finished) {
     var seq1 = ["z", "a"];
     var seq2 = ["a"];
@@ -461,7 +461,7 @@ suite.addTests({
     assert.equal("DA00 M10 ", callback.result);
     finished();
   },
-
+  
   "Should correctly test balanced h":function(assert, finished) {
     var seq1 = ["a", "b", "c"];
     var seq2 = ["x", "y", "z"];
@@ -470,7 +470,7 @@ suite.addTests({
     assert.equal("C00 C11 C22 ", callback.result);
     finished();
   },
-
+  
   "Should correctly test balanced i":function(assert, finished) {
     var seq1 = ["abcd", "efgh", "ijkl", "mnopqrstuvwxyz"];
     var seq2 = [];
@@ -479,7 +479,7 @@ suite.addTests({
     assert.equal("DA00 DA10 DA20 DA30 ", callback.result);
     finished();
   },
-
+  
   "Should correctly test balanced j":function(assert, finished) {
     var seq1 = [];
     var seq2 = ["abcd", "efgh", "ijkl", "mnopqrstuvwxyz"];
@@ -488,8 +488,111 @@ suite.addTests({
     assert.equal("DB00 DB01 DB02 DB03 ", callback.result);
     finished();
   },
+  
+  "Should correctly test patch diff":function(assert, finished) {
+    // var ps = null, ms1 = null, ms2 = null, ms3 = null;
+    var seq1 = ["a", "b", "c", "e", "h", "j", "l", "m", "n", "p"];
+    var seq2 = ["b", "c", "d", "e", "f", "j", "k", "l", "m", "r", "s", "t"];
+    
+    var ps = Difference.LCS.diff(seq1, seq2);
+    var ms1 = Difference.LCS.patch(seq1, ps);
+    var ms2 = Difference.LCS.patch(seq2, ps, 'unpatch');
+    var ms3 = Difference.LCS.patch(seq2, ps);
+    
+    assert.deepEqual(seq2, ms1);
+    assert.deepEqual(seq1, ms2);
+    assert.deepEqual(seq1, ms3);
+    
+    ps = Difference.LCS.diff(seq1, seq2, Difference.LCS.ContextDiffCallbacks);
+    ms1 = Difference.LCS.patch(seq1, ps);
+    ms2 = Difference.LCS.patch(seq2, ps, 'unpatch');
+    ms3 = Difference.LCS.patch(seq2, ps);
+    
+    assert.deepEqual(seq2, ms1);
+    assert.deepEqual(seq1, ms2);
+    assert.deepEqual(seq1, ms3);
+    
+    ps = Difference.LCS.diff(seq1, seq2, Difference.LCS.SDiffCallbacks);
+    ms1 = Difference.LCS.patch(seq1, ps);
+    ms2 = Difference.LCS.patch(seq2, ps, 'unpatch');
+    ms3 = Difference.LCS.patch(seq2, ps);
 
+    assert.deepEqual(seq2, ms1);
+    assert.deepEqual(seq1, ms2);
+    assert.deepEqual(seq1, ms3);
+    
+    finished();    
+  },
+  
+  "Should correctly do more patches":function(assert, finished) {
+    // var s1 = null, s2 = null, s3 = null, s4 = null, s5 = null, ps = null;
+    var s1 = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"];
+    var s2 = ["a", "b", "c", "d", "D", "e", "f", "g", "h", "i", "j", "k"];
+    var ps = Difference.LCS.diff(s1, s2);
+    var s3 = Difference.LCS.patch(s1, ps, 'patch');
+    ps = Difference.LCS.diff(s1, s2, Difference.LCS.ContextDiffCallbacks);
+    var s4 = Difference.LCS.patch(s1, ps, 'patch');
+    ps = Difference.LCS.diff(s1, s2, Difference.LCS.SDiffCallbacks);
+    var s5 = Difference.LCS.patch(s1, ps, 'patch');
+    
+    assert.deepEqual(s2, s3);
+    assert.deepEqual(s2, s4);
+    assert.deepEqual(s2, s5);
+    
+    ps = Difference.LCS.sdiff(s1, s2);
+    s3 = Difference.LCS.patch(s1, ps, 'patch');
+    ps = Difference.LCS.diff(s1, s2, Difference.LCS.ContextDiffCallbacks);
+    s4 = Difference.LCS.patch(s1, ps, 'patch');
+    ps = Difference.LCS.diff(s1, s2, Difference.LCS.DiffCallbacks)
+    s5 = Difference.LCS.patch(s1, ps, 'patch');
+    
+    assert.deepEqual(s2, s3);
+    assert.deepEqual(s2, s4);
+    assert.deepEqual(s2, s5)
+    finished();
+  },
+  
+  "Should correctly patch with sdiff":function(assert, finished) {
+    var seq1 = ["a", "b", "c", "e", "h", "j", "l", "m", "n", "p"];
+    var seq2 = ["b", "c", "d", "e", "f", "j", "k", "l", "m", "r", "s", "t"];
+
+    var ps = Difference.LCS.sdiff(seq1, seq2);
+    var ms1 = Difference.LCS.patch(seq1, ps);
+    var ms2 = Difference.LCS.patch(seq2, ps, 'unpatch');
+    var ms3 = Difference.LCS.patch(seq2, ps);
+    
+    assert.deepEqual(seq2, ms1);
+    assert.deepEqual(seq1, ms2);
+    assert.deepEqual(seq1, ms3);
+    
+    ps = Difference.LCS.sdiff(seq1, seq2, Difference.LCS.ContextDiffCallbacks);
+    ms1 = Difference.LCS.patch(seq1, ps);
+    ms2 = Difference.LCS.patch(seq2, ps, 'unpatch');
+    ms3 = Difference.LCS.patch(seq2, ps);
+    
+    assert.deepEqual(seq2, ms1);
+    assert.deepEqual(seq1, ms2);
+    assert.deepEqual(seq1, ms3);
+    
+    ps = Difference.LCS.sdiff(seq1, seq2, Difference.LCS.DiffCallbacks);
+    ms1 = Difference.LCS.patch(seq1, ps);
+    ms2 = Difference.LCS.patch(seq2, ps, 'unpatch');
+    ms3 = Difference.LCS.patch(seq2, ps);
+    
+    assert.deepEqual(seq2, ms1);
+    assert.deepEqual(seq1, ms2);
+    assert.deepEqual(seq1, ms3);    
+    finished();
+  }
 });
+
+// Gotten from
+var flatten = function(array) {
+  return array.reduce(function(a,b) {  
+    return a.concat(b);  
+  }, []);
+}
+
 
 // sys.puts("========================================== CORRECT SDIFF")
 // correct_sdiff.forEach(function(f) {
