@@ -3,6 +3,9 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 var sys = require('sys');
 
+// Diff tests
+// require('diff/test_diff').suite.runTests(function() {});
+
 // Run all tests
 // require('test_head').suite.runTests(function() {});
 // require('test_diff').suite.runTests(function() {});
@@ -21,6 +24,5 @@ var sys = require('sys');
 // require('test_raw').suite.runTests(function() {});
 // require('test_remote').suite.runTests(function() {});
 // require('test_repo').suite.runTests(function() {});
-// require('test_git_basic').suite.runTests(function() {});
+require('test_git_basic').suite.runTests(function() {});
 
-require('diff/test_diff').suite.runTests(function() {});
