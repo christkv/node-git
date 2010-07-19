@@ -117,7 +117,7 @@ suite.addTests({
         assert.equal('Tom Preston-Werner', commit.committer.name);
         assert.equal('tom@mojombo.com', commit.committer.email);
         assert.deepEqual(new Date(1191997100 * 1000), commit.committed_date);
-        assert.equal('initial grit setup\n', commit.message);
+        assert.equal('initial grit setup', commit.message);
         
         finished();
       });

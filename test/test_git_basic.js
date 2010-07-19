@@ -16,6 +16,11 @@ var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
+// Chomp text removing end carriage returns
+var chomp = function chomp(raw_text) {
+  return raw_text.replace(/(\n|\r)+$/, '');
+}
+
 suite.addTests({  
   "Should correctly init gitdir":function(assert, finished) {
     var tmp_path = '/tmp/gitdir';
@@ -100,261 +105,153 @@ suite.addTests({
       finished();
     })
   },
-
-
   
-  // // __bake__
-  // "Test commit bake":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.rev_list = function(a, b, callback) {
-  //         callback(null, fixture('rev_list_single'));
-  //       }
-  //       
-  //     var commit = new Commit(repo, '4c8124ffcf4039d292442eeccabdeca5af5c5017')
-  //     assert.equal("Tom Preston-Werner", commit.author.name);
-  //     assert.equal("tom@mojombo.com", commit.author.email);        
-  //     finished();
-  //   });    
-  // },
-  // 
-  // // short_name
-  // "Test abbreviation of id":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.commit('80f136f500dfdb8c3e8abf4ae716f875f0a1b57f', function(err, commit) {
-  //       commit.id_abbrev(function(err, id_abbrev) {
-  //         assert.equal("80f136f", id_abbrev);
-  //         finished();        
-  //       })
-  //     });
-  //   });        
-  // },
-  // 
-  // // count
-  // "Test commit count":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     Commit.count(repo, 'master', function(err, count) {
-  //       assert.equal(107, count);
-  //       finished();
-  //     })
-  //   });    
-  // },
-  // 
-  // // diff
-  // "Test correct execution of diff":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.diff = function(a, b, callback) {
-  //         assert.equal(true, a['full_index']);
-  //         assert.equal('master', b);        
-  //         callback(null, fixture('diff_p'));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     Commit.diff(repo, 'master', function(err, diffs) {
-  //       assert.equal('.gitignore', diffs[0].a_path);
-  //       assert.equal('.gitignore', diffs[0].b_path);
-  //       assert.equal('4ebc8aea50e0a67e000ba29a30809d0a7b9b2666', diffs[0].a_blob.id);
-  //       assert.equal('2dd02534615434d88c51307beb0f0092f21fd103', diffs[0].b_blob.id);
-  //       assert.equal('100644', diffs[0].b_mode);
-  //       assert.equal(false, diffs[0].new_file);
-  //       assert.equal(false, diffs[0].deleted_file);
-  //       assert.equal("--- a/.gitignore\n+++ b/.gitignore\n@@ -1 +1,2 @@\n coverage\n+pkg", diffs[0].diff);
-  //       
-  //       assert.equal('lib/grit/actor.rb', diffs[5].a_path);
-  //       assert.equal(null, diffs[5].a_blob);
-  //       assert.equal('f733bce6b57c0e5e353206e692b0e3105c2527f4', diffs[5].b_blob.id);
-  //       assert.equal(true, diffs[5].new_file);
-  //       finished();
-  //     });
-  //   });        
-  // },
-  // 
-  // "Test diff with two commits":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.diff = function(a, b, c, callback) {
-  //         assert.equal(true, a['full_index']);
-  //         assert.equal('59ddc32', b);        
-  //         assert.equal('13d27d5', c);        
-  //         callback(null, fixture('diff_2'));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     Commit.diff(repo, '59ddc32', '13d27d5', function(err, diffs) {
-  //       assert.equal(3, diffs.length);
-  //       assert.deepEqual(["lib/grit/commit.rb", "test/fixtures/show_empty_commit", "test/test_commit.rb"], diffs.map(function(diff) { return diff.a_path; }));
-  //       finished();
-  //     });
-  //   });    
-  // },
-  // 
-  // "Test diff with files":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.diff = function(a, b, c, d, callback) {
-  //         assert.equal(true, a['full_index']);
-  //         assert.equal('59ddc32', b);        
-  //         assert.equal('--', c);        
-  //         assert.equal('lib', d);
-  //         callback(null, fixture('diff_f'));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     Commit.diff(repo, '59ddc32', ["lib"], function(err, diffs) {
-  //       assert.equal(1, diffs.length);
-  //       assert.deepEqual('lib/grit/diff.rb', diffs[0].a_path);
-  //       finished();
-  //     });
-  //   });        
-  // },
-  // 
-  // "Test diff with two commits and files":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.diff = function(a, b, c, d, e, callback) {
-  //         assert.equal(true, a['full_index']);
-  //         assert.equal('59ddc32', b);
-  //         assert.equal('13d27d5', c);
-  //         assert.equal('--', d);
-  //         assert.equal('lib', e);
-  //         callback(null, fixture('diff_2f'));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     Commit.diff(repo, '59ddc32', '13d27d5', ["lib"], function(err, diffs) {
-  //       assert.equal(1, diffs.length);
-  //       assert.deepEqual('lib/grit/commit.rb', diffs[0].a_path);
-  //       finished();
-  //     });
-  //   });    
-  // },
-  // 
-  // // diffs
-  // "Test diffs":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.diff = function() {
-  //         var args = Array.prototype.slice.call(arguments, 0);
-  //         // Pop the callback
-  //         var callback = args.pop();
-  //         callback(null, fixture('diff_p'));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     var commit = new Commit(repo, '91169e1f5fa4de2eaea3f176461f5dc784796769');
-  //     commit.diffs(function(err, diffs) {
-  //       assert.equal(15, diffs.length);
-  //       
-  //       assert.equal('.gitignore', diffs[0].a_path);
-  //       assert.equal('.gitignore', diffs[0].b_path);
-  //       assert.equal('4ebc8aea50e0a67e000ba29a30809d0a7b9b2666', diffs[0].a_blob.id);
-  //       assert.equal('2dd02534615434d88c51307beb0f0092f21fd103', diffs[0].b_blob.id);
-  //       assert.equal('100644', diffs[0].b_mode);
-  //       assert.equal(false, diffs[0].new_file);
-  //       assert.equal(false, diffs[0].deleted_file);
-  //       assert.equal("--- a/.gitignore\n+++ b/.gitignore\n@@ -1 +1,2 @@\n coverage\n+pkg", diffs[0].diff);
-  //       
-  //       assert.equal('lib/grit/actor.rb', diffs[5].a_path);
-  //       assert.equal(null, diffs[5].a_blob);
-  //       assert.equal('f733bce6b57c0e5e353206e692b0e3105c2527f4', diffs[5].b_blob.id);
-  //       assert.equal(true, diffs[5].new_file);
-  //       
-  //       finished();
-  //     });
-  //   });        
-  // }, 
-  // 
-  // "Test diffs on initial import":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.show = function(options, sha, callback) {
-  //         assert.deepEqual({full_index:true, pretty:'raw'}, options);
-  //         assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', sha);          
-  //         callback(null, fixture('diff_i', true));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     var commit = new Commit(repo, '634396b2f541a9f2d58b00be1a07f0c358b999b3');
-  //     commit.diffs(function(err, diffs) {
-  //       assert.equal(10, diffs.length);
-  //       
-  //       assert.equal('History.txt', diffs[0].a_path);
-  //       assert.equal('History.txt', diffs[0].b_path);
-  //       assert.equal(null, diffs[0].a_blob);
-  //       assert.equal(null, diffs[0].b_mode);
-  //       assert.equal('81d2c27608b352814cbe979a6acd678d30219678', diffs[0].b_blob.id);
-  //       assert.equal(true, diffs[0].new_file);
-  //       assert.equal(false, diffs[0].deleted_file);
-  //       assert.equal("--- /dev/null\n+++ b/History.txt\n@@ -0,0 +1,5 @@\n+== 1.0.0 / 2007-10-09\n+\n+* 1 major enhancement\n+  * Birthday!\n+", diffs[0].diff);
-  //       
-  //       assert.equal('lib/grit.rb', diffs[5].a_path);
-  //       assert.equal(null, diffs[5].a_blob);
-  //       assert.equal('32cec87d1e78946a827ddf6a8776be4d81dcf1d1', diffs[5].b_blob.id);
-  //       assert.equal(true, diffs[5].new_file);        
-  //       finished();
-  //     });
-  //   });            
-  // },
-  // 
-  // "Test diffs on initial import with empty commit":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.show = function(options, sha, callback) {
-  //         assert.deepEqual({full_index:true, pretty:'raw'}, options);
-  //         assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', sha);          
-  //         callback(null, fixture('show_empty_commit', true));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     var commit = new Commit(repo, '634396b2f541a9f2d58b00be1a07f0c358b999b3');      
-  //     commit.diffs(function(err, diffs) {
-  //       assert.deepEqual([], diffs);
-  //       finished();
-  //     });
-  //   });                
-  // },
-  // 
-  // "Test diffs with mode only change":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     repo.git.diff = function(options, sha, callback) {
-  //         var args = Array.prototype.slice.call(arguments, 0);
-  //         callback = args.pop();
-  //         callback(null, fixture('diff_mode_only', true));
-  //       }
-  //       
-  //     // Fetch the diff
-  //     var commit = new Commit(repo, '91169e1f5fa4de2eaea3f176461f5dc784796769');      
-  //     commit.diffs(function(err, diffs) {
-  //       assert.equal(23, diffs.length);
-  //       assert.equal('100644', diffs[0].a_mode);
-  //       assert.equal('100755', diffs[0].b_mode);
-  //       finished();
-  //     });
-  //   });    
-  // },
-  // 
-  // // to String
-  // "Test toString() override for the commit":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     // Fetch the diff
-  //     var commit = new Commit(repo, 'abc');
-  //     assert.equal("abc", commit.toString());
-  //     finished();
-  //   });
-  // },
-  // 
-  // // to patch
-  // "Test create patch from commit":function(assert, finished) {
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-  //     // Fetch the diff
-  //     var commit = new Commit(repo, '80f136f500dfdb8c3e8abf4ae716f875f0a1b57f');
-  //     commit.toPatch(function(err, patch) {
-  //       // sys.puts(patch)
-  //       assert.ok(patch.indexOf('From 80f136f500dfdb8c3e8abf4ae716f875f0a1b57f Mon Sep 17 00:00:00 2001') != -1);
-  //       assert.ok(patch.indexOf('From: tom <tom@taco.(none)>') != -1);
-  //       assert.ok(patch.indexOf('Date: Tue, 20 Nov 2007 17:27:42 -0800') != -1);
-  //       assert.ok(patch.indexOf('Subject: [PATCH] fix tests on other machines') != -1);
-  //       assert.ok(patch.indexOf('test/test_reality.rb |   30 +++++++++++++++---------------') != -1);
-  //       assert.ok(patch.indexOf('@@ -1,17 +1,17 @@') != -1);
-  //       assert.ok(patch.indexOf('+#     recurse(t)') != -1);
-  //       assert.ok(patch.indexOf('1.6.') != -1);
-  //       finished();
-  //     });
-  //   });    
-  // },
+  "Should correctly perform remove diff":function(assert, finished) {
+    var commit1 = 'c9cf68fc61bd2634e90a4f6a12d88744e6297c4e';
+    var commit2 = '7a8d32cb18a0ba2ff8bf86cadacc3fd2816da219';    
+  
+    var git = new Git("./test/dot_git");
+    git.diff(commit1, commit2, {}, function(err, out) {
+      assert.equal(null, err);
+      assert.ok(out.indexOf('--- a/test/fixtures/diff_2\n+++ /dev/null') != -1);
+      assert.ok(out.indexOf('diff --git a/test/fixtures/diff_2 b/test/fixtures/diff_2') != -1);
+      assert.ok(out.indexOf('index 0000000..2e3b0cb') != -1);
+      finished();
+    });    
+  },
+  
+  "Should correctly cat file contents from commit":function(assert, finished) {
+    var commit_sha = '5e3ee1198672257164ce3fe31dea3e40848e68d5';
+    
+    var git = new Git("./test/dot_git");
+    git.cat_file("p", commit_sha, function(err, out) {
+      assert.equal(null, err);
+      assert.equal(fixture('cat_file_commit_ruby'), out);
+      finished();
+    });
+  },
+  
+  "Should correctly cat file contents from tree":function(assert, finished) {
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+    
+    var git = new Git("./test/dot_git");
+    git.cat_file("p", tree_sha, function(err, out) {
+      assert.equal(null, err);
+      assert.equal(fixture('cat_file_tree_ruby', true), out);
+      finished();
+    });
+  },
+  
+  "Should correctly cat file contents from blob":function(assert, finished) {
+    var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce';
+    
+    var git = new Git("./test/dot_git");
+    git.cat_file("p", blob_sha, function(err, out) {
+      assert.equal(null, err);
+      assert.equal(fixture('cat_file_blob_ruby'), out);
+      finished();
+    });
+  },
+  
+  "Should correctly cat file size":function(assert, finished) {
+    var blob_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+    
+    var git = new Git("./test/dot_git");
+    git.cat_file("s", blob_sha, function(err, out) {
+      assert.equal(null, err);
+      assert.equal('252', out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute ls_tree":function(assert, finished) {
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+    
+    var git = new Git("./test/dot_git");
+    git.ls_tree(tree_sha, function(err, out) {
+      assert.equal(null, err);
+      assert.equal(fixture('cat_file_tree_ruby', true), out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute ls_tree with blobs":function(assert, finished) {
+    var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce';
+    
+    var git = new Git("./test/dot_git");
+    git.ls_tree(blob_sha, function(err, out) {
+      assert.equal(null, err);
+      assert.equal(null, out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute ls_tree with treeish":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+  
+    git.ls_tree('testing', function(err, out) {
+      assert.equal(null, err);
+      assert.equal(fixture('cat_file_tree_ruby', true), out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute ls_tree with ls_tree_paths":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+    var paths = ['History.txt', 'lib'];
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+  
+    git.ls_tree(tree_sha, paths, function(err, out) {
+      assert.equal(null, err);
+      assert.equal(fixture('ls_tree_paths_ruby', true), out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute ls_tree with ls_tree_paths multi single":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+    var paths = ['lib/grit.rb'];
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+  
+    git.ls_tree(tree_sha, paths, function(err, out) {
+      assert.equal(null, err);
+      assert.equal("100644 blob 6afcf64c80da8253fa47228eb09bc0eea217e5d1\tlib/grit.rb", out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute ls_tree with recursive":function(assert, finished) {
+    // this is the tree associated with @commit_sha, which we use in
+    // the next test    
+    var git = new Git("./test/dot_git");
+    var tree_sha = '77fc9894c0904279fde93adc9c0ba231515ce68a';
+  
+    git.ls_tree(tree_sha, null, {r:true}, function(err, out) {      
+      assert.equal(null, err);
+      assert.equal(fixture('ls_tree_recursive'), out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute ls_tree with recursive and a commit":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+    var commit_sha = '5e3ee1198672257164ce3fe31dea3e40848e68d5';
+  
+    git.ls_tree(commit_sha, null, {r:true}, function(err, out) {      
+      assert.equal(null, err);
+      assert.equal(fixture('ls_tree_recursive'), out);
+      finished();
+    });
+  },
+  
+  "Should correctly execute rev_list pretty":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+  
+    git.rev_list({pretty:'raw'}, 'master', function(err, out) {
+      assert.equal(fixture('rev_list_all'), out);
+      finished();      
+    });
+  },
 });
 
 
