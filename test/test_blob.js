@@ -77,7 +77,7 @@ suite.addTests({
   "Should correctly return mime_type for known types":function(assert, finished) {
     // Open the first repo
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
-      var blob = new Blob(repo, 'abc', 'foo.png');
+      var blob = new Blob(repo, null, 'abc', 'foo.png');
       assert.equal('image/png', blob.mime_type);
       finished();
     });
@@ -127,7 +127,7 @@ suite.addTests({
   "Should correctly return the base name":function(assert, finished) {
     // Open the first repo
     new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
-      var blob = new Blob(repo, null, 'foo/bar.rb');
+      var blob = new Blob(repo, null, null, 'foo/bar.rb');
       assert.equal('bar.rb', blob.basename);
       finished();
     });        
