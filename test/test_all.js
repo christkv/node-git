@@ -25,4 +25,5 @@ require('test_raw').suite.runTests(function() {});
 require('test_remote').suite.runTests(function() {});
 require('test_repo').suite.runTests(function() {});
 require('test_git_basic').suite.runTests(function() {});
+require('test_git_alt').suite.runTests(function() {});
 

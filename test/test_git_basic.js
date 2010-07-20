@@ -252,6 +252,109 @@ suite.addTests({
       finished();      
     });
   },
+  
+  "Should correctly execute rev_list raw since":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+  
+    git.rev_list({since:new Date(1204644738*1000)}, 'master', function(err, out) {
+      assert.ok(out.match(fixture('rev_list_since')));
+      finished();      
+    });    
+  },
+  
+  "Should correctly execute rev_list raw":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+  
+    git.rev_list({pretty:'raw'}, 'f1964ad1919180dd1d9eae9d21a1a1f68ac60e77', function(err, out) {      
+      assert.ok(out.match('f1964ad1919180dd1d9eae9d21a1a1f68ac60e77'))
+      assert.equal(656, out.split(/\n/).length)
+      finished();      
+    });    
+  },
+  
+  "Should correctly execute rev_list":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+  
+    git.rev_list({}, 'master', function(err, out) {
+      var lines = out.split('\n');
+      var lines2 = fixture('rev_list_lines').split('\n');
+      for(var i = 0; i < lines.length; i++) { assert.equal(lines[i], lines2[i]) }
+      finished();      
+    });    
+  },
+  
+  "Should correctly execute rev_list range":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+  
+    git.rev_list({}, '30e367cef2203eba2b341dc9050993b06fd1e108..3fa4e130fa18c92e3030d4accb5d3e0cadd40157', function(err, out) {
+      assert.equal(fixture('rev_list_range', true), out)
+      finished();      
+    });    
+  },
+  
+  "Should correctly execute ls_tree_paths multi":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+    var paths = ['History.txt', 'lib/grit.rb'];
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+  
+    git.ls_tree(tree_sha, paths, {}, function(err, out) {
+      assert.equal(fixture('ls_tree_paths_ruby_deep', true), out)
+      finished();      
+    });    
+  }, 
+  
+  "Should correctly execute ls_tree_path":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+    var paths = ['lib/'];
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+  
+    git.ls_tree(tree_sha, paths, function(err, out) {      
+      assert.equal('100644 blob 6afcf64c80da8253fa47228eb09bc0eea217e5d1\tlib/grit.rb\n040000 tree 6244414d0229fb2bd58bc426a2afb5ba66773498\tlib/grit', out)
+      finished();      
+    });    
+  },
+  
+  "Should correctly execute ls_tree_path deep":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+    var paths = ['lib/grit/']
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+  
+    git.ls_tree(tree_sha, paths, function(err, out) {      
+      assert.equal(fixture('ls_tree_subdir', true), out)
+      finished();      
+    });    
+  },
+  
+  "Should correctly retrieve file type":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+    var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
+    var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce';
+    var commit_sha = '5e3ee1198672257164ce3fe31dea3e40848e68d5';
+    
+    git.file_type(tree_sha, function(err, result) {
+      assert.equal('tree', result)
+    })
+  
+    git.file_type(blob_sha, function(err, result) {
+      assert.equal('blob', result)
+    })
+  
+    git.file_type(commit_sha, function(err, result) {
+      assert.equal('commit', result)
+    })
+  
+    finished();
+  },
+  
+  "Should correctly execute ls_tree and return no sha found tree":function(assert, finished) {
+    var git = new Git("./test/dot_git");
+
+    git.ls_tree('6afcf64c80da8253fa47228eb09bc0eea217e5d0', function(err, out) {      
+      assert.equal('no such sha found', err)
+      finished();      
+    });    
+  },
+
 });
 
 
