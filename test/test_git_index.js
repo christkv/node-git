@@ -59,16 +59,11 @@ suite.addTests({
 
     create_tmp_directory(base_repo, function(err, target_path) {
       new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
-        // try {
         var repository = repo.git.repository;
         var user = Actor.from_string("Tom Werner <tom@example.com>");
 
         // Fetch the commits
         repo.commits(function(err, commits) {
-          sys.puts("=============================================================== commits")
-          // sys.puts(sys.inspect(commits))
-          
-
           var sha = commits[0].tree.id;
           
           repo.index(function(err, index) {
@@ -78,17 +73,17 @@ suite.addTests({
               index.add('atester.rb', 'test stuff');
               index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
                 repo.commits(function(err, _commits) {
-
-                  sys.puts(sys.inspect(_commits))
+                  var c = _commits[0].tree.find('atester.rb');
+                  assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
                   // Destory directory and cleanup
-                  // destroy_directory(target_path, function(err, result) {          
-                  //   finished();
-                  // });                
-                })                
-              })              
+                  destroy_directory(target_path, function(err, result) {          
+                    finished();
+                  });                
+                });
+              });
             });            
           });
-        })
+        });
       });
     });
   }
