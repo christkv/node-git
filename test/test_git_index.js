@@ -77,11 +77,14 @@ suite.addTests({
               // Add files
               index.add('atester.rb', 'test stuff');
               index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
-                
-                // Destory directory and cleanup
-                destroy_directory(target_path, function(err, result) {          
-                  finished();
-                });                
+                repo.commits(function(err, _commits) {
+
+                  sys.puts(sys.inspect(_commits))
+                  // Destory directory and cleanup
+                  // destroy_directory(target_path, function(err, result) {          
+                  //   finished();
+                  // });                
+                })                
               })              
             });            
           });
