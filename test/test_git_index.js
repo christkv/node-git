@@ -90,12 +90,12 @@ suite.addTests({
   
   "Should correctly add path file":function(assert, finished) {
     var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
-
+  
     create_tmp_directory(base_repo, function(err, target_path) {
       new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
         var repository = repo.git.repository;
         var user = Actor.from_string("Tom Werner <tom@example.com>");
-
+  
         // Fetch the commits
         repo.commits(function(err, commits) {
           var sha = commits[0].tree.id;
@@ -124,97 +124,82 @@ suite.addTests({
         });
       });
     });    
-  }
+  },
   
-  // "Should correctly execute basic":function(assert, finished) {
-  //   // Sha's
-  //   var commit_sha = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a';
-  //   var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
-  //   var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce';
-  //   // Binary form of sha1
-  //   var sha_hex = to_bin(commit_sha);
-  // 
-  //   // Populate repos
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) { 
-  //     var repo1 = repo; 
-  // 
-  //     new Repo("./test/dot_git_clone", {is_bare:true}, function(err, repo) { 
-  //       var repo2 = repo; 
-  //       
-  //       repo1.git.repository.in_loose(sha_hex, function(err, result) {
-  //         assert.ok(result);
-  //       });
-  //       
-  //       repo2.git.repository.in_loose(sha_hex, function(err, result) {
-  //         assert.ok(result);
-  //       });
-  //       
-  //       repo1.git.repository.object_exists(commit_sha, function(err, result) {
-  //         assert.ok(result);
-  //       });
-  //       
-  //       repo2.git.repository.object_exists(commit_sha, function(err, result) {
-  //         assert.ok(result);
-  //       });
-  //       
-  //       repo1.commits(function(err, commits) {
-  //         assert.equal(10, commits.length);
-  //       })
-  // 
-  //       repo2.commits(function(err, commits) {
-  //         assert.equal(10, commits.length);
-  //         finished();
-  //       })
-  //   });
-  //   });
-  // }, 
-  // 
-  // "Should correctly work with clone of clone":function(assert, finished) {
-  //   // Sha's
-  //   var commit_sha = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a';
-  //   var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
-  //   var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce';
-  //   // Binary form of sha1
-  //   var sha_hex = to_bin(commit_sha);
-  // 
-  //   // Populate repos
-  //   new Repo("./test/dot_git", {is_bare:true}, function(err, repo) { 
-  //     var repo1 = repo; 
-  // 
-  //     new Repo("./test/dot_git_clone", {is_bare:true}, function(err, repo) { 
-  //       var repo2 = repo; 
-  //       
-  //       new Repo("./test/dot_git_clone2", {is_bare:true}, function(err, repo) { 
-  //         var repo3 = repo; 
-  //         
-  //         repo2.git.repository.in_loose(sha_hex, function(err, result) {
-  //           assert.ok(result);
-  //         });
-  //         
-  //         repo3.git.repository.in_loose(sha_hex, function(err, result) {
-  //           assert.ok(result);
-  //         });
-  //         
-  //         repo2.git.repository.object_exists(commit_sha, function(err, result) {
-  //           assert.ok(result);
-  //         });
-  //         
-  //         repo3.git.repository.object_exists(commit_sha, function(err, result) {
-  //           assert.ok(result);
-  //         });
-  //         
-  //         repo2.commits(function(err, commits) {
-  //           assert.equal(10, commits.length);
-  //         })
-  //         
-  //         repo3.commits(function(err, commits) {
-  //           assert.equal(10, commits.length);
-  //           finished();
-  //         })
-  //       });        
-  //     });
-  //   });    
-  // }
+  "Should correctly add correct order for commited files":function(assert, finished) {
+    var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
+  
+    create_tmp_directory(base_repo, function(err, target_path) {
+      new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
+        var repository = repo.git.repository;
+        var user = Actor.from_string("Tom Werner <tom@example.com>");
+  
+        // Fetch the commits
+        repo.commits(function(err, commits) {
+          var sha = commits[0].tree.id;
+          
+          repo.index(function(err, index) {
+            // Read the tree in
+            index.read_tree(sha, function(err, tree) {
+              // Add files
+              index.add('lib.rb', 'test stuff');
+              // Commit files
+              index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
+                repo.commits(function(err, _commits) {
+                  // Retrieve the names from the tree contents
+                  var tr = _commits[0].tree.contents;
+                  var entries = tr.filter(function(c) { return c.name.substr(0, 3) == 'lib'; }).map(function(c) { return c.name; });
+                  // Assert correct order
+                  assert.equal('lib.rb', entries[0]);
+                  assert.equal('lib', entries[1]);                  
+                  // Destroy directory and cleanup
+                  destroy_directory(target_path, function(err, result) {          
+                    finished();
+                  });                
+                });
+              });
+            });
+          });
+        });
+      });
+    });        
+  },
+  
+  "Should correctly modify file":function(assert, finished) {
+    var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
+
+    create_tmp_directory(base_repo, function(err, target_path) {
+      new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
+        var repository = repo.git.repository;
+        var user = Actor.from_string("Tom Werner <tom@example.com>");
+
+        // Fetch the commits
+        repo.commits(function(err, commits) {
+          var sha = commits[0].tree.id;
+          
+          repo.index(function(err, index) {
+            // Read the tree in
+            index.read_tree(sha, function(err, tree) {
+              // Add files
+              index.add('README.txt', 'test more stuff');
+              // Commit files
+              index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
+                repo.commits(function(err, _commits) {
+                  // Retrieve the names from the tree contents
+                  var b = _commits[0].tree.find('README.txt');
+                  assert.equal('e45d6b418e34951ddaa3e78e4fc4d3d92a46d3d1', b.id);
+                  // Destroy directory and cleanup
+                  destroy_directory(target_path, function(err, result) {          
+                    finished();
+                  });                
+                });
+              });
+            });
+          });
+        });
+      });
+    });        
+  }
 });
 
 
