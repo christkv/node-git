@@ -54,39 +54,39 @@ var destroy_directory = function(directory, callback) {
   Test basic node-git functionality
 **/
 suite.addTests({
-  // "Sould correctly add files":function(assert, finished) {
-  //   var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
-  // 
-  //   create_tmp_directory(base_repo, function(err, target_path) {
-  //     new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
-  //       var repository = repo.git.repository;
-  //       var user = Actor.from_string("Tom Werner <tom@example.com>");
-  // 
-  //       // Fetch the commits
-  //       repo.commits(function(err, commits) {
-  //         var sha = commits[0].tree.id;
-  //         
-  //         repo.index(function(err, index) {
-  //           // Read the tree in
-  //           index.read_tree(sha, function(err, tree) {
-  //             // Add files
-  //             index.add('atester.rb', 'test stuff');
-  //             index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
-  //               repo.commits(function(err, _commits) {
-  //                 var c = _commits[0].tree.find('atester.rb');
-  //                 assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
-  //                 // Destory directory and cleanup
-  //                 destroy_directory(target_path, function(err, result) {          
-  //                   finished();
-  //                 });                
-  //               });
-  //             });
-  //           });            
-  //         });
-  //       });
-  //     });
-  //   });
-  // },
+  "Sould correctly add files":function(assert, finished) {
+    var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
+  
+    create_tmp_directory(base_repo, function(err, target_path) {
+      new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
+        var repository = repo.git.repository;
+        var user = Actor.from_string("Tom Werner <tom@example.com>");
+  
+        // Fetch the commits
+        repo.commits(function(err, commits) {
+          var sha = commits[0].tree.id;
+          
+          repo.index(function(err, index) {
+            // Read the tree in
+            index.read_tree(sha, function(err, tree) {
+              // Add files
+              index.add('atester.rb', 'test stuff');
+              index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
+                repo.commits(function(err, _commits) {
+                  var c = _commits[0].tree.find('atester.rb');
+                  assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
+                  // Destory directory and cleanup
+                  destroy_directory(target_path, function(err, result) {          
+                    finished();
+                  });                
+                });
+              });
+            });            
+          });
+        });
+      });
+    });
+  },
   
   "Should correctly add path file":function(assert, finished) {
     var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
