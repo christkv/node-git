@@ -349,7 +349,7 @@ suite.addTests({
   "Should correctly execute ls_tree and return no sha found tree":function(assert, finished) {
     var git = new Git("./test/dot_git");
 
-    git.ls_tree('6afcf64c80da8253fa47228eb09bc0eea217e5d0', function(err, out) {      
+    git.ls_tree('6afcf64c80da8253fa47228eb09bc0eea217e5d0', function(err, out) {
       assert.equal('no such sha found', err)
       finished();      
     });    

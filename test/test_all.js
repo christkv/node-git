@@ -30,4 +30,5 @@ require('test_git_index').suite.runTests(function() {});
 require('test_git_iv2').suite.runTests(function() {});
 require('test_submodule').suite.runTests(function() {});
 require('test_tag').suite.runTests(function() {});
+require('test_tree').suite.runTests(function() {});
 
