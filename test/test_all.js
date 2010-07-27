@@ -27,4 +27,6 @@ require('test_repo').suite.runTests(function() {});
 require('test_git_basic').suite.runTests(function() {});
 require('test_git_alt').suite.runTests(function() {});
 require('test_git_index').suite.runTests(function() {});
+require('test_git_iv2').suite.runTests(function() {});
+require('test_submodule').suite.runTests(function() {});
 
