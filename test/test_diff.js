@@ -3,10 +3,10 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
+  Repo = require('git').Repo,
   fs = require('fs'),
-  Diff = require('git/diff').Diff,
-  Blob = require('git/blob').Blob;
+  Diff = require('git').Diff,
+  Blob = require('git').Blob;
 
 var suite = exports.suite = new TestSuite("diff tests");
 
@@ -17,7 +17,7 @@ var fixture = function(name, trim) {
 suite.addTests({
   "Test list from string new mode":function(assert, finished) {
 
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var output = fixture('diff_new_mode');
 
       Diff.list_from_string(repo, output, function(err, diffs) {

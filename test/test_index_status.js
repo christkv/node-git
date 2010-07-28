@@ -4,7 +4,7 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   fs = require('fs'),
-  Repo = require('git/repo').Repo;
+  Repo = require('git').Repo;
 
 var suite = exports.suite = new TestSuite("index status tests");
 
@@ -17,7 +17,7 @@ var fixture = function(name, trim) {
 **/
 suite.addTests({
   "Should correctly add a file":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {        
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.add = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
         var callback = args.pop();
@@ -37,7 +37,7 @@ suite.addTests({
   },
   
   "Should correctly add an array":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {        
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.add = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
         var callback = args.pop();
@@ -57,7 +57,7 @@ suite.addTests({
   },
   
   "Should correctly remove a file":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {        
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.remove = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
         var callback = args.pop();
@@ -77,7 +77,7 @@ suite.addTests({
   },
   
   "Should correctly remove an array":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {        
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.remove = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
         var callback = args.pop();
@@ -97,7 +97,7 @@ suite.addTests({
   },
   
   "Should correctly execute status":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.diff_index = function(a, b) {
         var args = Array.prototype.slice.call(arguments, 0);
         var callback = args.pop();        

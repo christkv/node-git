@@ -3,8 +3,8 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
-  BinaryParser = require('git/binary_parser').BinaryParser;
+  Repo = require('git').Repo,
+  BinaryParser = require('git').BinaryParser;
 
 var suite = exports.suite = new TestSuite("node-git alt tests");
 

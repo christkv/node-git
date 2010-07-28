@@ -5,11 +5,11 @@ var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   fs = require('fs'),
   exec  = require('child_process').exec,
-  Repo = require('git/repo').Repo,
-  BinaryParser = require('git/binary_parser').BinaryParser,
-  Actor = require('git/actor').Actor,
-  Blob = require('git/blob').Blob,
-  Submodule = require('git/sub_module').Submodule;
+  Repo = require('git').Repo,
+  BinaryParser = require('git').BinaryParser,
+  Actor = require('git').Actor,
+  Blob = require('git').Blob,
+  Submodule = require('git').Submodule;
 
 var suite = exports.suite = new TestSuite("node-git tag tests");
 

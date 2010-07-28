@@ -3,12 +3,12 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
-  Git = require('git/git').Git,
+  Repo = require('git').Repo,
+  Git = require('git').Git,
   fs = require('fs'),
-  Commit = require('git/commit').Commit,
-  Blob = require('git/blob').Blob,
-  GitFileOperations = require('git/git_file_operations').GitFileOperations;
+  Commit = require('git').Commit,
+  Blob = require('git').Blob,
+  GitFileOperations = require('git').GitFileOperations;
 
 var suite = exports.suite = new TestSuite("git basic tests");
 

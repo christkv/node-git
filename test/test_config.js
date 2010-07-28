@@ -3,10 +3,10 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
+  Repo = require('git').Repo,
   fs = require('fs'),
-  Commit = require('git/commit').Commit,
-  Blob = require('git/blob').Blob;
+  Commit = require('git').Commit,
+  Blob = require('git').Blob;
 
 var suite = exports.suite = new TestSuite("config tests");
 
@@ -16,7 +16,7 @@ var fixture = function(name, trim) {
 
 suite.addTests({  
   "Should correctly return an assoc array":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       repo.git.config = function() {
           var args = Array.prototype.slice.call(arguments, 0);
           // Pop the callback
@@ -35,7 +35,7 @@ suite.addTests({
   },
   
   "Should correctly set value":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       repo.git.config = function() {        
           var args = Array.prototype.slice.call(arguments, 0);                    
           // Pop the callback

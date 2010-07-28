@@ -3,10 +3,10 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
+  Repo = require('git').Repo,
   fs = require('fs'),
-  Actor = require('git/actor').Actor,
-  Git = require('git/git').Git;
+  Actor = require('git').Actor,
+  Git = require('git').Git;
 
 var suite = exports.suite = new TestSuite("blame tree tests");
 

@@ -3,11 +3,11 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
+  Repo = require('git').Repo,
   fs = require('fs'),
-  Blob = require('git/blob').Blob,
-  Commit = require('git/commit').Commit,
-  GitFileOperations = require('git/git_file_operations').GitFileOperations;
+  Blob = require('git').Blob,
+  Commit = require('git').Commit,
+  GitFileOperations = require('git').GitFileOperations;
 
 var suite = exports.suite = new TestSuite("commit stats tests");
 
@@ -18,7 +18,7 @@ var fixture = function(name, trim) {
 suite.addTests({  
   "Should correctly retrieve commit stats":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var back_exists = GitFileOperations.fs_exist;
       
       GitFileOperations.fs_exist = function(dir, path, callback) {         
@@ -47,7 +47,7 @@ suite.addTests({
   
   "Should correctly match the content":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var back_exists = GitFileOperations.fs_exist;
       
       GitFileOperations.fs_exist = function(dir, path, callback) {         

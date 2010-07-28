@@ -5,11 +5,11 @@ var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   fs = require('fs'),
   exec  = require('child_process').exec,
-  Repo = require('git/repo').Repo,
-  BinaryParser = require('git/binary_parser').BinaryParser,
-  Actor = require('git/actor').Actor,
-  Blob = require('git/blob').Blob,
-  Submodule = require('git/sub_module').Submodule;
+  Repo = require('git').Repo,
+  BinaryParser = require('git').BinaryParser,
+  Actor = require('git').Actor,
+  Blob = require('git').Blob,
+  Submodule = require('git').Submodule;
 
 var suite = exports.suite = new TestSuite("node-git submodule tests");
 
@@ -56,7 +56,7 @@ var destroy_directory = function(directory, callback) {
 **/
 suite.addTests({
   "Should correctly extract the config":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var data = fixture('gitmodules');
       var blob = {data:data, id:'abc'};
       var tree = {find:function() { return blob; }};
@@ -127,7 +127,7 @@ suite.addTests({
   
   //  inspect 
   "Should correctly extract base name":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       Submodule.create(repo, {name:'foo/bar'}, function(err, submodule) {
         assert.equal('bar', submodule.basename);
         finished();        

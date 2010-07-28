@@ -5,10 +5,10 @@ var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   fs = require('fs'),
   exec  = require('child_process').exec,
-  Repo = require('git/repo').Repo,
-  BinaryParser = require('git/binary_parser').BinaryParser,
-  Actor = require('git/actor').Actor,
-  Blob = require('git/blob').Blob;
+  Repo = require('git').Repo,
+  BinaryParser = require('git').BinaryParser,
+  Actor = require('git').Actor,
+  Blob = require('git').Blob;
 
 var suite = exports.suite = new TestSuite("node-git index tests");
 
@@ -55,7 +55,7 @@ var destroy_directory = function(directory, callback) {
 **/
 suite.addTests({
   "Sould correctly add files":function(assert, finished) {
-    var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
+    var base_repo = "./test/dot_git_iv2"
   
     create_tmp_directory(base_repo, function(err, target_path) {
       new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
@@ -89,7 +89,7 @@ suite.addTests({
   },
   
   "Should correctly add path file":function(assert, finished) {
-    var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
+    var base_repo = "./test/dot_git_iv2"
   
     create_tmp_directory(base_repo, function(err, target_path) {
       new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
@@ -127,7 +127,7 @@ suite.addTests({
   },
   
   "Should correctly add correct order for commited files":function(assert, finished) {
-    var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
+    var base_repo = "./test/dot_git_iv2"
   
     create_tmp_directory(base_repo, function(err, target_path) {
       new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
@@ -166,7 +166,7 @@ suite.addTests({
   },
   
   "Should correctly modify file":function(assert, finished) {
-    var base_repo = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git_iv2"
+    var base_repo = "./test/dot_git_iv2"
 
     create_tmp_directory(base_repo, function(err, target_path) {
       new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         

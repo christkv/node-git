@@ -203,7 +203,7 @@ class Gunzip : public EventEmitter {
       data_len -= CHUNK;
     }
     // Close and clean up
-     inflateEnd(&strm);
+    inflateEnd(&strm);
     return ret;
   }
 

@@ -4,8 +4,8 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   fs = require('fs'),
-  Repo = require('git/repo').Repo,
-  Merge = require('git/merge').Merge;
+  Repo = require('git').Repo,
+  Merge = require('git').Merge;
 
 var suite = exports.suite = new TestSuite("raw tests");
 

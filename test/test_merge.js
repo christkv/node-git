@@ -4,8 +4,8 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
   fs = require('fs'),
-  Repo = require('git/repo').Repo,
-  Merge = require('git/merge').Merge;
+  Repo = require('git').Repo,
+  Merge = require('git').Merge;
 
 var suite = exports.suite = new TestSuite("merge tests");
 
@@ -18,7 +18,7 @@ var fixture = function(name, trim) {
 **/
 suite.addTests({
   "Should correctly create merge from string":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {        
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       var merge_text = fixture("merge_result");
       var merge = new Merge(merge_text);
 

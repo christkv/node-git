@@ -3,17 +3,17 @@ require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/li
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
-  Repo = require('git/repo').Repo,
-  Ref = require('git/ref').Ref,
-  Head = require('git/head').Head,
-  Tag = require('git/tag').Tag,
-  Remote = require('git/remote').Remote,
-  Blob = require('git/blob').Blob,
-  Submodule = require('git/sub_module').Submodule,
-  Tree = require('git/tree').Tree,
-  Git = require('git/git').Git,
-  Commit = require('git/commit').Commit,
-  GitFileOperations = require('git/git_file_operations').GitFileOperations,
+  Repo = require('git').Repo,
+  Ref = require('git').Ref,
+  Head = require('git').Head,
+  Tag = require('git').Tag,
+  Remote = require('git').Remote,
+  Blob = require('git').Blob,
+  Submodule = require('git').Submodule,
+  Tree = require('git').Tree,
+  Git = require('git').Git,
+  Commit = require('git').Commit,
+  GitFileOperations = require('git').GitFileOperations,
   fs = require('fs'),
   exec  = require('child_process').exec;
 
@@ -54,7 +54,7 @@ var destroy_directory = function(directory, callback) {
 **/
 suite.addTests({
   "Should update refs packed":function(assert, finished) {
-    var a = "/Users/christian.kvalheim/coding/checkouts/grit/test/dot_git"
+    var a = "./test/dot_git"
     
     // create_tmp_directory("./test/dot_git", function(err, target_path) {
     create_tmp_directory(a, function(err, target_path) {
@@ -108,7 +108,7 @@ suite.addTests({
   
   // Description
   "Should correctly retrieve the description":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.description(function(err, description) {
         assert.ok(description.indexOf("Unnamed repository; edit this file") != -1);
         finished();
@@ -118,7 +118,7 @@ suite.addTests({
   
   // Refs
   "Should correctly return array of ref objects":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.refs(function(err, refs) {
         refs.forEach(function(ref) {
           assert.ok(ref instanceof Remote || ref instanceof Tag || ref instanceof Head);
@@ -211,7 +211,7 @@ suite.addTests({
   },
   
   "Should correctly retrieve the commit":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.commit('634396b2f541a9f2d58b00be1a07f0c358b999b3', function(err, commit) {
         assert.equal('634396b2f541a9f2d58b00be1a07f0c358b999b3', commit.id);
         finished();
@@ -232,7 +232,7 @@ suite.addTests({
       }
     };
     
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.commit_count('master', function(err, count) {
         assert.equal(655, count);
   
@@ -244,33 +244,33 @@ suite.addTests({
   },
     
   // tree
-  // "Should correctly retrieve the repo tree":function(assert, finished) {
-  //   // Save function we are mocking
-  //   var back = Git.prototype.ls_tree;
-  //   Git.prototype.ls_tree = function(treeish, paths, options, callback) { 
-  //     var self = this;
-  //     var args = Array.prototype.slice.call(arguments, 0);
-  //     callback = args.pop();
-  //     
-  //     callback(null, fixture('ls_tree_a', true)); 
-  //   };    
-  //   
-  //   new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
-  //     repo.tree('master', function(err, tree) {
-  //       var entries_1 = tree.contents.filter(function(entry) { return entry instanceof Blob; })
-  //       var entries_2 = tree.contents.filter(function(entry) { return entry instanceof Tree; })
-  //       assert.equal(4, entries_1.length);
-  //       assert.equal(3, entries_2.length);
-  //       // Restore the ls_tree function
-  //       Git.prototype.ls_tree = back;
-  //       finished();        
-  //     });
-  //   });
-  // },
+  "Should correctly retrieve the repo tree":function(assert, finished) {
+    // Save function we are mocking
+    var back = Git.prototype.ls_tree;
+    Git.prototype.ls_tree = function(treeish, paths, options, callback) { 
+      var self = this;
+      var args = Array.prototype.slice.call(arguments, 0);
+      callback = args.pop();
+      
+      callback(null, fixture('ls_tree_a', true)); 
+    };    
+    
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
+      repo.tree('master', function(err, tree) {
+        var entries_1 = tree.contents.filter(function(entry) { return entry instanceof Blob; })
+        var entries_2 = tree.contents.filter(function(entry) { return entry instanceof Tree; })
+        assert.equal(4, entries_1.length);
+        assert.equal(3, entries_2.length);
+        // Restore the ls_tree function
+        Git.prototype.ls_tree = back;
+        finished();        
+      });
+    });
+  },
     
   // blob
   "Should correctly fetch blog instance":function(assert, finished) {  
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       // Save function we are mocking
       var back = Git.prototype.cat_file;
       Git.prototype.cat_file = function(type, ref, callback) { 
@@ -347,7 +347,7 @@ suite.addTests({
   
   // fork_bare
   "Should correctly fork_bare":function(assert, finished) {            
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var back_clone = Git.prototype.clone;
       Git.prototype.clone = function(options, original_path, target_path, callback) { 
         callback(null, null)
@@ -377,7 +377,7 @@ suite.addTests({
   
   // diff
   // "Should correctly do a diff between two entries":function(assert, finished) {
-  //   new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+  //   new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
   //     var back_diff = Git.prototype.diff;
   //     
   //     Git.prototype.diff = function(a, b, c, d, e, callback) { 
@@ -414,7 +414,7 @@ suite.addTests({
     
   // commit_diff
   "Should correctly do a commit diff":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       var back_diff = Git.prototype.diff;
   
       Git.prototype.diff = function() { 
@@ -439,7 +439,7 @@ suite.addTests({
     
   // alternates
   "Should correctly locate alternates":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       var back_exists = GitFileOperations.fs_exist;
       var back_read = GitFileOperations.fs_read;
       
@@ -466,7 +466,7 @@ suite.addTests({
   },
   
   "Should fail to retrieve alternates":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       var back_exists = GitFileOperations.fs_exist;
   
       GitFileOperations.fs_exist = function(dir, path, callback) {         
@@ -486,7 +486,7 @@ suite.addTests({
   
   // set alternates
   "Should correctly set alternates":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       var alts = {"/path/to/repo.git/objects":1, "/path/to/repo2.git/objects":1};
       var alts_array = ["/path/to/repo.git/objects", "/path/to/repo2.git/objects"];
   
@@ -516,7 +516,7 @@ suite.addTests({
   },
   
   "Should fail to set alternates":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var alts = {"/path/to/repo.git/objects":1};
       var alts_array = ["/path/to/repo.git/objects"];
   
@@ -535,7 +535,7 @@ suite.addTests({
   },
   
   "Should set empty alternates":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var back_write = GitFileOperations.fs_write;
   
       GitFileOperations.fs_write = function(dir, path, content, callback) { 
@@ -555,7 +555,7 @@ suite.addTests({
     
   // log
   "Should correctly test log":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var back_log = Git.prototype.log;
   
       Git.prototype.log = function(commit, path, options, callback) {
@@ -581,7 +581,7 @@ suite.addTests({
   },
   
   "Should test log with path and options":function(assert, finished) {
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       var back_log = Git.prototype.log;
   
       Git.prototype.log = function(commit, path, options, callback) { 
@@ -610,9 +610,9 @@ suite.addTests({
   // commit_deltas_from
   "Should correctly extract commit deltas from nothing new":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       // Open object to the other repo
-      new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, other_repo) {  
+      new Repo("./test/grit", {is_bare:true}, function(err, other_repo) {  
         repo.git.rev_list = function(a, b, callback) {
             assert.deepEqual({}, a);
             assert.equal('master', b);
@@ -635,9 +635,9 @@ suite.addTests({
   
   "Should commit deltas from when other has new":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       // Open object to the other repo
-      new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, other_repo) {  
+      new Repo("./test/grit", {is_bare:true}, function(err, other_repo) {  
         var commit_ids = {"4c8124ffcf4039d292442eeccabdeca5af5c5017":1, "634396b2f541a9f2d58b00be1a07f0c358b999b3":1, "ab25fd8483882c3bda8a458ad2965d2248654335":1};
         var commit_ids_array = ["4c8124ffcf4039d292442eeccabdeca5af5c5017", "634396b2f541a9f2d58b00be1a07f0c358b999b3", "ab25fd8483882c3bda8a458ad2965d2248654335"];
   
@@ -671,7 +671,7 @@ suite.addTests({
   // object_exist
   "Should correctly select existing objects":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {  
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {  
       var before = ['634396b2f541a9f2d58b00be1a07f0c358b999b3', 'deadbeef'];
       var after = ['634396b2f541a9f2d58b00be1a07f0c358b999b3'];
   
