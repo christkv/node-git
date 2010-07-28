@@ -18,7 +18,7 @@ suite.addTests({
   // blob
   "Should not locate blob":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.blob("blahblah", function(err, blob) {
         assert.ok(blob instanceof Blob);
         finished();
@@ -28,7 +28,7 @@ suite.addTests({
   
   "Should correctly return blob contents":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.cat_file = function(type, ref, callback) {
           callback(null, fixture('cat_file_blob'));
         }
@@ -41,7 +41,7 @@ suite.addTests({
   
   "Should correctly cache data":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var times_called = 0;
       
       repo.git.cat_file = function(type, ref, callback) {
@@ -60,7 +60,7 @@ suite.addTests({
   // size
   "Should correctly return the file size":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.cat_file = function(type, ref, callback) {
           callback(null, fixture('cat_file_blob_size'));
         }
@@ -76,7 +76,7 @@ suite.addTests({
   // mime_type
   "Should correctly return mime_type for known types":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var blob = new Blob(repo, null, 'abc', 'foo.png');
       assert.equal('image/png', blob.mime_type);
       finished();
@@ -85,7 +85,7 @@ suite.addTests({
   
   "Should correctly return text plain for unknown types":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var blob = new Blob(repo, 'abc');
       assert.equal('text/plain', blob.mime_type);
       finished();
@@ -96,7 +96,7 @@ suite.addTests({
   
   "Should correctly grab the blame":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.blame = function(type, ref, callback) {
           var args = Array.prototype.slice.call(arguments, 0);
           // Pop the callback
@@ -125,7 +125,7 @@ suite.addTests({
   
   "Should correctly return the base name":function(assert, finished) {
     // Open the first repo
-    new Repo("/Users/christian.kvalheim/coding/checkouts/grit", {is_bare:true}, function(err, repo) {
+    new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var blob = new Blob(repo, null, null, 'foo/bar.rb');
       assert.equal('bar.rb', blob.basename);
       finished();
