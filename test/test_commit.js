@@ -54,9 +54,14 @@ suite.addTests({
   // diff
   "Test correct execution of diff":function(assert, finished) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-      repo.git.diff = function(a, b, callback) {
-          assert.equal(true, a['full_index']);
-          assert.equal('master', b);        
+      repo.git.diff = function(a, b, c, callback) {
+          var args = Array.prototype.slice.call(arguments, 1);
+          callback = args.pop();
+          b = args.length ? args.shift() : null;
+          c = args.length ? args.shift() : {};
+
+          assert.equal(true, c['full_index']);
+          assert.equal('master', a);        
           callback(null, fixture('diff_p'));
         }
         
@@ -83,9 +88,14 @@ suite.addTests({
   "Test diff with two commits":function(assert, finished) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.diff = function(a, b, c, callback) {
-          assert.equal(true, a['full_index']);
-          assert.equal('59ddc32', b);        
-          assert.equal('13d27d5', c);        
+          var args = Array.prototype.slice.call(arguments, 1);
+          callback = args.pop();
+          b = args.length ? args.shift() : null;
+          c = args.length ? args.shift() : {};
+
+          assert.equal(true, c['full_index']);
+          assert.equal('59ddc32', a);        
+          assert.equal('13d27d5', b);        
           callback(null, fixture('diff_2'));
         }
         
@@ -100,11 +110,11 @@ suite.addTests({
   
   "Test diff with files":function(assert, finished) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-      repo.git.diff = function(a, b, c, d, callback) {
-          assert.equal(true, a['full_index']);
-          assert.equal('59ddc32', b);        
-          assert.equal('--', c);        
-          assert.equal('lib', d);
+      repo.git.call_git = function(a, b, c, d, e, callback) {
+          var args = Array.prototype.slice.call(arguments, 1);
+          callback = args.pop();
+          assert.equal(true, d['full_index']);
+          assert.deepEqual([ '59ddc32', '--', 'lib' ], e);
           callback(null, fixture('diff_f'));
         }
         
