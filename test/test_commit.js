@@ -272,7 +272,7 @@ suite.addTests({
         assert.ok(patch.indexOf('test/test_reality.rb |   30 +++++++++++++++---------------') != -1);
         assert.ok(patch.indexOf('@@ -1,17 +1,17 @@') != -1);
         assert.ok(patch.indexOf('+#     recurse(t)') != -1);
-        assert.ok(patch.indexOf('1.6.') != -1);
+        assert.ok(patch.indexOf('1.7.') != -1);
         finished();
       });
     });    

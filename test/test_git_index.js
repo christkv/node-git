@@ -167,12 +167,12 @@ suite.addTests({
   
   "Should correctly modify file":function(assert, finished) {
     var base_repo = "./test/dot_git_iv2"
-
+  
     create_tmp_directory(base_repo, function(err, target_path) {
       new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
         var repository = repo.git.repository;
         var user = Actor.from_string("Tom Werner <tom@example.com>");
-
+  
         // Fetch the commits
         repo.commits(function(err, commits) {
           var sha = commits[0].tree.id;

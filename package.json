@@ -1,6 +1,6 @@
 { "name" :            "git"
 , "description" :     "A node.js library for git"
-, "version" :         "0.1"
+, "version" :         "0.1.0"
 , "scripts" :       { "install" : "./install.sh" }
 , "author" :          "Christian Amor Kvalheim <christkv@gmail.com>"
 , "contributors" :  []

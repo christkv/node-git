@@ -24,7 +24,7 @@ suite.addTests({
     var git = new Git("./test/grit");
     git.git('bad', function(err, result) {
       assert.ok(err);
-      assert.ok(err.indexOf("git: 'bad' is not a git-command") != -1);
+      assert.ok(err.indexOf("git: 'bad' is not a git command") != -1);
       finished();
     })
   }, 
@@ -33,7 +33,7 @@ suite.addTests({
     var git = new Git("./test/grit");
     git.git('bad', {timeout:false}, function(err, result) {
       assert.ok(err);
-      assert.ok(err.indexOf("git: 'bad' is not a git-command") != -1);
+      assert.ok(err.indexOf("git: 'bad' is not a git command") != -1);
       finished();
     })    
   },
