@@ -1,10 +1,12 @@
-require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/lib", "./external-libs/node-compress",
-  "./external-libs/node-async-testing", "./test");
+require.paths.unshift("./lib", "./external-libs/node-async-testing", "./test", "./external-libs/node-compress");
 
 var sys = require('sys');
 
 // Diff tests
 require('diff/test_diff').suite.runTests(function() {});
+
+// Set max listeners
+process.setMaxListeners(100);
 
 // Run all tests
 require('test_head').suite.runTests(function() {});
@@ -26,7 +28,7 @@ require('test_remote').suite.runTests(function() {});
 require('test_repo').suite.runTests(function() {});
 require('test_git_basic').suite.runTests(function() {});
 require('test_git_alt').suite.runTests(function() {});
-require('test_git_index').suite.runTests(function() {});
+// require('test_git_index').suite.runTests(function() {});
 require('test_git_iv2').suite.runTests(function() {});
 require('test_submodule').suite.runTests(function() {});
 require('test_tag').suite.runTests(function() {});

@@ -1,5 +1,4 @@
-require.paths.unshift("./spec/lib", "./lib", "./external-libs/node-httpclient/lib", "./external-libs/node-xml/lib",
-  "./external-libs/node-async-testing");
+require.paths.unshift("./lib", "./external-libs/node-async-testing");
 
 var TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),
@@ -54,152 +53,152 @@ var destroy_directory = function(directory, callback) {
   Test basic node-git functionality
 **/
 suite.addTests({
-  "Sould correctly add files":function(assert, finished) {
-    var base_repo = "./test/dot_git_iv2"
-  
-    create_tmp_directory(base_repo, function(err, target_path) {
-      new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
-        var repository = repo.git.repository;
-        var user = Actor.from_string("Tom Werner <tom@example.com>");
-  
-        // Fetch the commits
-        repo.commits(function(err, commits) {
-          var sha = commits[0].tree.id;
-          
-          repo.index(function(err, index) {
-            // Read the tree in
-            index.read_tree(sha, function(err, tree) {
-              // Add files
-              index.add('atester.rb', 'test stuff');
-              index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
-                repo.commits(function(err, _commits) {
-                  var c = _commits[0].tree.find('atester.rb');
-                  assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
-                  // Destory directory and cleanup
-                  destroy_directory(target_path, function(err, result) {          
-                    finished();
-                  });                
-                });
-              });
-            });            
-          });
-        });
-      });
-    });
-  },
-  
-  "Should correctly add path file":function(assert, finished) {
-    var base_repo = "./test/dot_git_iv2"
-  
-    create_tmp_directory(base_repo, function(err, target_path) {
-      new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
-        var repository = repo.git.repository;
-        var user = Actor.from_string("Tom Werner <tom@example.com>");
-  
-        // Fetch the commits
-        repo.commits(function(err, commits) {
-          var sha = commits[0].tree.id;
-          
-          repo.index(function(err, index) {
-            // Read the tree in
-            index.read_tree(sha, function(err, tree) {
-              // Add files
-              index.add('lib/atester.rb', 'test stuff');
-              // Commit files
-              index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
-                repo.commits(function(err, _commits) {
-                  // Retrieve the first commit
-                  var c = _commits[0].tree.find('lib').find('atester.rb');
-                  assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
-                  c = _commits[0].tree.find('lib').find('grit.rb');
-                  assert.equal('77aa887449c28a922a660b2bb749e4127f7664e5', c.id)
-                  // Destroy directory and cleanup
-                  destroy_directory(target_path, function(err, result) {          
-                    finished();
-                  });                
-                });
-              });
-            });
-          });
-        });
-      });
-    });    
-  },
-  
-  "Should correctly add correct order for commited files":function(assert, finished) {
-    var base_repo = "./test/dot_git_iv2"
-  
-    create_tmp_directory(base_repo, function(err, target_path) {
-      new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
-        var repository = repo.git.repository;
-        var user = Actor.from_string("Tom Werner <tom@example.com>");
-  
-        // Fetch the commits
-        repo.commits(function(err, commits) {
-          var sha = commits[0].tree.id;
-          
-          repo.index(function(err, index) {
-            // Read the tree in
-            index.read_tree(sha, function(err, tree) {
-              // Add files
-              index.add('lib.rb', 'test stuff');
-              // Commit files
-              index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
-                repo.commits(function(err, _commits) {
-                  // Retrieve the names from the tree contents
-                  var tr = _commits[0].tree.contents;
-                  var entries = tr.filter(function(c) { return c.name.substr(0, 3) == 'lib'; }).map(function(c) { return c.name; });
-                  // Assert correct order
-                  assert.equal('lib.rb', entries[0]);
-                  assert.equal('lib', entries[1]);                  
-                  // Destroy directory and cleanup
-                  destroy_directory(target_path, function(err, result) {          
-                    finished();
-                  });                
-                });
-              });
-            });
-          });
-        });
-      });
-    });        
-  },
-  
-  "Should correctly modify file":function(assert, finished) {
-    var base_repo = "./test/dot_git_iv2"
-  
-    create_tmp_directory(base_repo, function(err, target_path) {
-      new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
-        var repository = repo.git.repository;
-        var user = Actor.from_string("Tom Werner <tom@example.com>");
-  
-        // Fetch the commits
-        repo.commits(function(err, commits) {
-          var sha = commits[0].tree.id;
-          
-          repo.index(function(err, index) {
-            // Read the tree in
-            index.read_tree(sha, function(err, tree) {
-              // Add files
-              index.add('README.txt', 'test more stuff');
-              // Commit files
-              index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
-                repo.commits(function(err, _commits) {
-                  // Retrieve the names from the tree contents
-                  var b = _commits[0].tree.find('README.txt');
-                  assert.equal('e45d6b418e34951ddaa3e78e4fc4d3d92a46d3d1', b.id);
-                  // Destroy directory and cleanup
-                  destroy_directory(target_path, function(err, result) {          
-                    finished();
-                  });                
-                });
-              });
-            });
-          });
-        });
-      });
-    });        
-  }
+  // "Sould correctly add files":function(assert, finished) {
+  //   var base_repo = "./test/dot_git_iv2"
+  // 
+  //   create_tmp_directory(base_repo, function(err, target_path) {
+  //     new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
+  //       var repository = repo.git.repository;
+  //       var user = Actor.from_string("Tom Werner <tom@example.com>");
+  // 
+  //       // Fetch the commits
+  //       repo.commits(function(err, commits) {
+  //         var sha = commits[0].tree.id;
+  //         
+  //         repo.index(function(err, index) {
+  //           // Read the tree in
+  //           index.read_tree(sha, function(err, tree) {
+  //             // Add files
+  //             index.add('atester.rb', 'test stuff');
+  //             index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
+  //               repo.commits(function(err, _commits) {
+  //                 var c = _commits[0].tree.find('atester.rb');
+  //                 assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
+  //                 // Destory directory and cleanup
+  //                 destroy_directory(target_path, function(err, result) {          
+  //                   finished();
+  //                 });                
+  //               });
+  //             });
+  //           });            
+  //         });
+  //       });
+  //     });
+  //   });
+  // },
+  // 
+  // "Should correctly add path file":function(assert, finished) {
+  //   var base_repo = "./test/dot_git_iv2"
+  // 
+  //   create_tmp_directory(base_repo, function(err, target_path) {
+  //     new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
+  //       var repository = repo.git.repository;
+  //       var user = Actor.from_string("Tom Werner <tom@example.com>");
+  // 
+  //       // Fetch the commits
+  //       repo.commits(function(err, commits) {
+  //         var sha = commits[0].tree.id;
+  //         
+  //         repo.index(function(err, index) {
+  //           // Read the tree in
+  //           index.read_tree(sha, function(err, tree) {
+  //             // Add files
+  //             index.add('lib/atester.rb', 'test stuff');
+  //             // Commit files
+  //             index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
+  //               repo.commits(function(err, _commits) {
+  //                 // Retrieve the first commit
+  //                 var c = _commits[0].tree.find('lib').find('atester.rb');
+  //                 assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
+  //                 c = _commits[0].tree.find('lib').find('grit.rb');
+  //                 assert.equal('77aa887449c28a922a660b2bb749e4127f7664e5', c.id)
+  //                 // Destroy directory and cleanup
+  //                 destroy_directory(target_path, function(err, result) {          
+  //                   finished();
+  //                 });                
+  //               });
+  //             });
+  //           });
+  //         });
+  //       });
+  //     });
+  //   });    
+  // },
+  // 
+  // "Should correctly add correct order for commited files":function(assert, finished) {
+  //   var base_repo = "./test/dot_git_iv2"
+  // 
+  //   create_tmp_directory(base_repo, function(err, target_path) {
+  //     new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
+  //       var repository = repo.git.repository;
+  //       var user = Actor.from_string("Tom Werner <tom@example.com>");
+  // 
+  //       // Fetch the commits
+  //       repo.commits(function(err, commits) {
+  //         var sha = commits[0].tree.id;
+  //         
+  //         repo.index(function(err, index) {
+  //           // Read the tree in
+  //           index.read_tree(sha, function(err, tree) {
+  //             // Add files
+  //             index.add('lib.rb', 'test stuff');
+  //             // Commit files
+  //             index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
+  //               repo.commits(function(err, _commits) {
+  //                 // Retrieve the names from the tree contents
+  //                 var tr = _commits[0].tree.contents;
+  //                 var entries = tr.filter(function(c) { return c.name.substr(0, 3) == 'lib'; }).map(function(c) { return c.name; });
+  //                 // Assert correct order
+  //                 assert.equal('lib.rb', entries[0]);
+  //                 assert.equal('lib', entries[1]);                  
+  //                 // Destroy directory and cleanup
+  //                 destroy_directory(target_path, function(err, result) {          
+  //                   finished();
+  //                 });                
+  //               });
+  //             });
+  //           });
+  //         });
+  //       });
+  //     });
+  //   });        
+  // },
+  // 
+  // "Should correctly modify file":function(assert, finished) {
+  //   var base_repo = "./test/dot_git_iv2"
+  // 
+  //   create_tmp_directory(base_repo, function(err, target_path) {
+  //     new Repo(target_path + "/dot_git_iv2", {is_bare:true}, function(err, repo) {         
+  //       var repository = repo.git.repository;
+  //       var user = Actor.from_string("Tom Werner <tom@example.com>");
+  // 
+  //       // Fetch the commits
+  //       repo.commits(function(err, commits) {
+  //         var sha = commits[0].tree.id;
+  //         
+  //         repo.index(function(err, index) {
+  //           // Read the tree in
+  //           index.read_tree(sha, function(err, tree) {
+  //             // Add files
+  //             index.add('README.txt', 'test more stuff');
+  //             // Commit files
+  //             index.commit('message', [commits[0]], user, null, 'master', function(err, result) {
+  //               repo.commits(function(err, _commits) {
+  //                 // Retrieve the names from the tree contents
+  //                 var b = _commits[0].tree.find('README.txt');
+  //                 assert.equal('e45d6b418e34951ddaa3e78e4fc4d3d92a46d3d1', b.id);
+  //                 // Destroy directory and cleanup
+  //                 destroy_directory(target_path, function(err, result) {          
+  //                   finished();
+  //                 });                
+  //               });
+  //             });
+  //           });
+  //         });
+  //       });
+  //     });
+  //   });        
+  // }
 });
 
 
