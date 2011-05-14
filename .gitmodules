@@ -1,3 +1,0 @@
-[submodule "external-libs/node-async-testing"]
-	path = external-libs/node-async-testing
-	url = git://github.com/bentomas/node-async-testing.git
