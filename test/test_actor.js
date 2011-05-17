@@ -1,4 +1,3 @@
-require.paths.unshift("./lib", "./external-libs/node-async-testing");
 
 TestSuite = require('async_testing').TestSuite,
   sys = require('sys'),

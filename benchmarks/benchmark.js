@@ -1,10 +1,9 @@
-require.paths.unshift("../lib", "./external-libs/node-compress");
-  
+
 var Repo = require('git/repo').Repo,
   sys = require('sys'),
   fs = require('fs'),
-  exec  = require('child_process').exec;  
-  
+  exec  = require('child_process').exec;
+
 var number_of_executions = 30;
 
 var create_tmp_directory = function(clone_path, callback) {

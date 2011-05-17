@@ -1,4 +1,3 @@
-require.paths.unshift("./lib", "./external-libs/node-async-testing", "./test", "./external-libs/node-compress");
 
 var sys = require('sys');
 
