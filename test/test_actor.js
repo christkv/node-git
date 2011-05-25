@@ -1,35 +1,39 @@
-
-TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
-  Repo = require('git').Repo,
+var testCase = require('nodeunit').testCase,
+  Repo = require('../lib/git').Repo,
   fs = require('fs'),
-  Actor = require('git').Actor;
-
-var suite = exports.suite = new TestSuite("actor tests");
+  Actor = require('../lib/git').Actor;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
-suite.addTests({  
-  "Should create actor from string seperating name and email":function(assert, finished) {
+module.exports = testCase({
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+  
+  "Should create actor from string seperating name and email":function(assert) {
     var actor = Actor.from_string("Tom Werner <tom@example.com>");
     assert.equal("Tom Werner", actor.name);
     assert.equal("tom@example.com", actor.email);
-    finished();
+    assert.done();
   },
   
-  "Should create actor from string only containing name":function(assert, finished) {
+  "Should create actor from string only containing name":function(assert) {
     var actor = Actor.from_string("Tom Werner");
     assert.equal("Tom Werner", actor.name);
     assert.equal(null, actor.email);
-    finished();
+    assert.done();
   },
   
-  "Should correctly return name when calling toString()":function(assert, finished) {
+  "Should correctly return name when calling toString()":function(assert) {
     var actor = Actor.from_string("Tom Werner <tom@example.com>");
     assert.equal(actor.name, actor.toString());
-    finished();
+    assert.done();
   }
 });
 

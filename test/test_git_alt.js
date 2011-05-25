@@ -1,10 +1,6 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
-  Repo = require('git').Repo,
-  BinaryParser = require('git').BinaryParser;
-
-var suite = exports.suite = new TestSuite("node-git alt tests");
+var testCase = require('nodeunit').testCase,
+  Repo = require('../lib/git').Repo,
+  BinaryParser = require('../lib/git').BinaryParser;
 
 var to_bin = function(sha1o) {
   var sha1 = '';
@@ -17,8 +13,16 @@ var to_bin = function(sha1o) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  "Should correctly execute basic":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly execute basic":function(assert) {
     // Sha's
     var commit_sha = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a';
     var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
@@ -55,13 +59,13 @@ suite.addTests({
 
         repo2.commits(function(err, commits) {
           assert.equal(10, commits.length);
-          finished();
+          assert.done();
         })
     });
     });
   }, 
   
-  "Should correctly work with clone of clone":function(assert, finished) {
+  "Should correctly work with clone of clone":function(assert) {
     // Sha's
     var commit_sha = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a';
     var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
@@ -101,7 +105,7 @@ suite.addTests({
           
           repo3.commits(function(err, commits) {
             assert.equal(10, commits.length);
-            finished();
+            assert.done();
           })
         });        
       });

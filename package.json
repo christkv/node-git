@@ -1,6 +1,6 @@
 { "name" :            "git"
 , "description" :     "A node.js library for git"
-, "version" :         "0.1.1"
+, "version" :         "0.1.2"
 , "author" :          "Christian Amor Kvalheim <christkv@gmail.com>"
 , "contributors" :  []
 , "repository" :    { "type" :  "git"
@@ -14,7 +14,7 @@
 , "directories" :   { "lib" : "./lib/git" }
 , "engines" :       { "node" : ">=0.4.0" }
 , "dependencies":   { "compress" : ">=0.1.6" }
-, "devDependencies":{ "async_testing" : ">=0.3.2" }
+, "devDependencies":{ "nodeunit" : ">=0.5.1" }
 , "licenses" :    [ { "type" :  "Apache License, Version 2.0"
                     , "url" :   "http://www.apache.org/licenses/LICENSE-2.0" } ]
 }

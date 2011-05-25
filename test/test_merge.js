@@ -1,11 +1,7 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+var testCase = require('nodeunit').testCase,
   fs = require('fs'),
-  Repo = require('git').Repo,
-  Merge = require('git').Merge;
-
-var suite = exports.suite = new TestSuite("merge tests");
+  Repo = require('../lib/git').Repo,
+  Merge = require('../lib/git').Merge;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
@@ -14,15 +10,23 @@ var fixture = function(name, trim) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  "Should correctly create merge from string":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly create merge from string":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       var merge_text = fixture("merge_result");
       var merge = new Merge(merge_text);
 
       assert.equal(3, merge.sections);
       assert.equal(1, merge.conflicts);
-      finished();
+      assert.done();
     });        
   }
 });

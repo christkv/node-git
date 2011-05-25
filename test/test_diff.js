@@ -1,19 +1,23 @@
-
-TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
-  Repo = require('git').Repo,
+var testCase = require('nodeunit').testCase,
+  Repo = require('../lib/git').Repo,
   fs = require('fs'),
-  Diff = require('git').Diff,
-  Blob = require('git').Blob;
-
-var suite = exports.suite = new TestSuite("diff tests");
+  Diff = require('../lib/git').Diff,
+  Blob = require('../lib/git').Blob;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
-suite.addTests({
-  "Test list from string new mode":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Test list from string new mode":function(assert) {
 
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var output = fixture('diff_new_mode');
@@ -22,7 +26,7 @@ suite.addTests({
         assert.equal(2, diffs.length)
         assert.equal(10, diffs[0].diff.split(/\n/).length)
         assert.equal(null, diffs.pop().diff)        
-        finished();
+        assert.done();
       });      
     });
   }

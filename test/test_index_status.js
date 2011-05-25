@@ -1,10 +1,6 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+var testCase = require('nodeunit').testCase,
   fs = require('fs'),
-  Repo = require('git').Repo;
-
-var suite = exports.suite = new TestSuite("index status tests");
+  Repo = require('../lib/git').Repo;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
@@ -13,8 +9,16 @@ var fixture = function(name, trim) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  "Should correctly add a file":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly add a file":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.add = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -29,12 +33,12 @@ suite.addTests({
       repo.add('file1', 'file2', function(err, result) {
         assert.ok(!err)
         assert.ok(!result)
-        finished();
+        assert.done();
       })
     });    
   },
   
-  "Should correctly add an array":function(assert, finished) {
+  "Should correctly add an array":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.add = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -49,12 +53,12 @@ suite.addTests({
       repo.add(['file1', 'file2'], function(err, result) {
         assert.ok(!err)
         assert.ok(!result)
-        finished();
+        assert.done();
       })
     });
   },
   
-  "Should correctly remove a file":function(assert, finished) {
+  "Should correctly remove a file":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.remove = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -69,12 +73,12 @@ suite.addTests({
       repo.remove('file1', 'file2', function(err, result) {
         assert.ok(!err)
         assert.ok(!result)
-        finished();
+        assert.done();
       })
     });    
   },
   
-  "Should correctly remove an array":function(assert, finished) {
+  "Should correctly remove an array":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {        
       repo.git.remove = function(a, b, c) {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -89,12 +93,12 @@ suite.addTests({
       repo.remove(['file1', 'file2'], function(err, result) {
         assert.ok(!err)
         assert.ok(!result)
-        finished();
+        assert.done();
       })
     });
   },
   
-  "Should correctly execute status":function(assert, finished) {
+  "Should correctly execute status":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.diff_index = function(a, b) {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -123,7 +127,7 @@ suite.addTests({
         assert.equal('71e930d551c413a123f43e35c632ea6ba3e3705e', stat.sha_repo);
         assert.equal('100644', stat.mode_repo);
         assert.equal('M', stat.type);
-        finished();
+        assert.done();
       });
     });    
   }

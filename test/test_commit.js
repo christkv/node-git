@@ -1,20 +1,24 @@
-
-TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
-  Repo = require('git').Repo,
+var testCase = require('nodeunit').testCase,
+  Repo = require('../lib/git').Repo,
   fs = require('fs'),
-  Commit = require('git').Commit,
-  Blob = require('git').Blob;
-
-var suite = exports.suite = new TestSuite("commit tests");
+  Commit = require('../lib/git').Commit,
+  Blob = require('../lib/git').Blob;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
-suite.addTests({  
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
   // __bake__
-  "Test commit bake":function(assert, finished) {
+  "Test commit bake":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.rev_list = function(a, b, callback) {
           callback(null, fixture('rev_list_single'));
@@ -23,34 +27,34 @@ suite.addTests({
       var commit = new Commit(repo, '4c8124ffcf4039d292442eeccabdeca5af5c5017')
       assert.equal("Tom Preston-Werner", commit.author.name);
       assert.equal("tom@mojombo.com", commit.author.email);        
-      finished();
+      assert.done();
     });    
   },
   
   // short_name
-  "Test abbreviation of id":function(assert, finished) {
+  "Test abbreviation of id":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.commit('80f136f500dfdb8c3e8abf4ae716f875f0a1b57f', function(err, commit) {
         commit.id_abbrev(function(err, id_abbrev) {
           assert.equal("80f136f", id_abbrev);
-          finished();        
+          assert.done();        
         })
       });
     });        
   },
   
   // count
-  "Test commit count":function(assert, finished) {
+  "Test commit count":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       Commit.count(repo, 'master', function(err, count) {
         assert.equal(107, count);
-        finished();
+        assert.done();
       })
     });    
   },
   
   // diff
-  "Test correct execution of diff":function(assert, finished) {
+  "Test correct execution of diff":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.diff = function(a, b, c, callback) {
           var args = Array.prototype.slice.call(arguments, 1);
@@ -78,12 +82,12 @@ suite.addTests({
         assert.equal(null, diffs[5].a_blob);
         assert.equal('f733bce6b57c0e5e353206e692b0e3105c2527f4', diffs[5].b_blob.id);
         assert.equal(true, diffs[5].new_file);
-        finished();
+        assert.done();
       });
     });        
   },
   
-  "Test diff with two commits":function(assert, finished) {
+  "Test diff with two commits":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.diff = function(a, b, c, callback) {
           var args = Array.prototype.slice.call(arguments, 1);
@@ -101,12 +105,12 @@ suite.addTests({
       Commit.diff(repo, '59ddc32', '13d27d5', function(err, diffs) {
         assert.equal(3, diffs.length);
         assert.deepEqual(["lib/grit/commit.rb", "test/fixtures/show_empty_commit", "test/test_commit.rb"], diffs.map(function(diff) { return diff.a_path; }));
-        finished();
+        assert.done();
       });
     });    
   },
   
-  "Test diff with files":function(assert, finished) {
+  "Test diff with files":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.call_git = function(a, b, c, d, e, callback) {
           var args = Array.prototype.slice.call(arguments, 1);
@@ -120,12 +124,12 @@ suite.addTests({
       Commit.diff(repo, '59ddc32', ["lib"], function(err, diffs) {
         assert.equal(1, diffs.length);
         assert.deepEqual('lib/grit/diff.rb', diffs[0].a_path);
-        finished();
+        assert.done();
       });
     });        
   },
   
-  "Test diff with two commits and files":function(assert, finished) {
+  "Test diff with two commits and files":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.diff = function(a, b, c, d, e, callback) {
           assert.equal(true, a['full_index']);
@@ -140,13 +144,13 @@ suite.addTests({
       Commit.diff(repo, '59ddc32', '13d27d5', ["lib"], function(err, diffs) {
         assert.equal(1, diffs.length);
         assert.deepEqual('lib/grit/commit.rb', diffs[0].a_path);
-        finished();
+        assert.done();
       });
     });    
   },
   
   // diffs
-  "Test diffs":function(assert, finished) {
+  "Test diffs":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.diff = function() {
           var args = Array.prototype.slice.call(arguments, 0);
@@ -174,12 +178,12 @@ suite.addTests({
         assert.equal('f733bce6b57c0e5e353206e692b0e3105c2527f4', diffs[5].b_blob.id);
         assert.equal(true, diffs[5].new_file);
         
-        finished();
+        assert.done();
       });
     });        
   }, 
   
-  "Test diffs on initial import":function(assert, finished) {
+  "Test diffs on initial import":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.show = function(options, sha, callback) {
           assert.deepEqual({full_index:true, pretty:'raw'}, options);
@@ -205,12 +209,12 @@ suite.addTests({
         assert.equal(null, diffs[5].a_blob);
         assert.equal('32cec87d1e78946a827ddf6a8776be4d81dcf1d1', diffs[5].b_blob.id);
         assert.equal(true, diffs[5].new_file);        
-        finished();
+        assert.done();
       });
     });            
   },
   
-  "Test diffs on initial import with empty commit":function(assert, finished) {
+  "Test diffs on initial import with empty commit":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.show = function(options, sha, callback) {
           assert.deepEqual({full_index:true, pretty:'raw'}, options);
@@ -222,12 +226,12 @@ suite.addTests({
       var commit = new Commit(repo, '634396b2f541a9f2d58b00be1a07f0c358b999b3');      
       commit.diffs(function(err, diffs) {
         assert.deepEqual([], diffs);
-        finished();
+        assert.done();
       });
     });                
   },
   
-  "Test diffs with mode only change":function(assert, finished) {
+  "Test diffs with mode only change":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.diff = function(options, sha, callback) {
           var args = Array.prototype.slice.call(arguments, 0);
@@ -241,23 +245,23 @@ suite.addTests({
         assert.equal(23, diffs.length);
         assert.equal('100644', diffs[0].a_mode);
         assert.equal('100755', diffs[0].b_mode);
-        finished();
+        assert.done();
       });
     });    
   },
   
   // to String
-  "Test toString() override for the commit":function(assert, finished) {
+  "Test toString() override for the commit":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       // Fetch the diff
       var commit = new Commit(repo, 'abc');
       assert.equal("abc", commit.toString());
-      finished();
+      assert.done();
     });
   },
   
   // to patch
-  "Test create patch from commit":function(assert, finished) {
+  "Test create patch from commit":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       // Fetch the diff
       var commit = new Commit(repo, '80f136f500dfdb8c3e8abf4ae716f875f0a1b57f');
@@ -271,7 +275,7 @@ suite.addTests({
         assert.ok(patch.indexOf('@@ -1,17 +1,17 @@') != -1);
         assert.ok(patch.indexOf('+#     recurse(t)') != -1);
         assert.ok(patch.indexOf('1.7.') != -1);
-        finished();
+        assert.done();
       });
     });    
   },

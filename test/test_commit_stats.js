@@ -1,20 +1,24 @@
-
-TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
-  Repo = require('git').Repo,
+var testCase = require('nodeunit').testCase,
+  Repo = require('../lib/git').Repo,
   fs = require('fs'),
-  Blob = require('git').Blob,
-  Commit = require('git').Commit,
-  GitFileOperations = require('git').GitFileOperations;
-
-var suite = exports.suite = new TestSuite("commit stats tests");
+  Blob = require('../lib/git').Blob,
+  Commit = require('../lib/git').Commit,
+  GitFileOperations = require('../lib/git').GitFileOperations;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
-suite.addTests({  
-  "Should correctly retrieve commit stats":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly retrieve commit stats":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var back_exists = GitFileOperations.fs_exist;
@@ -38,12 +42,12 @@ suite.addTests({
         assert.equal(3, Object.keys(stats).length);
         // Reset the overriden function
         GitFileOperations.fs_exist = back_exists;
-        finished();
+        assert.done();
       })
     });    
   },
   
-  "Should correctly match the content":function(assert, finished) {
+  "Should correctly match the content":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var back_exists = GitFileOperations.fs_exist;
@@ -72,7 +76,7 @@ suite.addTests({
         assert.equal('{"id":"a49b96b339c525d7fd455e0ad4f6fe7b550c9543","files":[["examples/ex_add_commit.rb",13,0,13],["examples/ex_index.rb",1,1,2]],"additions":14,"deletions":1,"total":15}', JSON.stringify(stats['a49b96b339c525d7fd455e0ad4f6fe7b550c9543']));
         // Reset the overriden function
         GitFileOperations.fs_exist = back_exists;
-        finished();
+        assert.done();
       })
     });        
   }  

@@ -1,16 +1,12 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+var testCase = require('nodeunit').testCase,
   fs = require('fs'),
   exec  = require('child_process').exec,
-  Repo = require('git').Repo,
-  BinaryParser = require('git').BinaryParser,
-  Actor = require('git').Actor,
-  Blob = require('git').Blob,
-  Submodule = require('git').Submodule,
-  Tree = require('git').Tree;
-
-var suite = exports.suite = new TestSuite("node-git tree tests");
+  Repo = require('../lib/git').Repo,
+  BinaryParser = require('../lib/git').BinaryParser,
+  Actor = require('../lib/git').Actor,
+  Blob = require('../lib/git').Blob,
+  Submodule = require('../lib/git').Submodule,
+  Tree = require('../lib/git').Tree;
 
 var to_bin = function(sha1o) {
   var sha1 = '';
@@ -53,19 +49,27 @@ var destroy_directory = function(directory, callback) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
   // contents
-  "Should correctly handle a no tree":function(assert, finished) {
+  "Should correctly handle a no tree":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.tree('blahblah', function(err, tree) {
         assert.ok(Array.isArray(tree.contents));
         assert.ok(tree instanceof Tree);
-        finished();
+        assert.done();
       })      
     });    
   },
   
-  "Should correctly handle a no tree":function(assert, finished) {
+  "Should correctly handle a no tree":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       var number = 0;
       
@@ -88,13 +92,13 @@ suite.addTests({
         child.contents;
         // Ensure the content was cached        
         assert.equal(2, number)
-        finished();
+        assert.done();
       })      
     });    
   },
   
   // content_from_string
-  "Should correctly return a tree from a content to string call":function(assert, finished) {
+  "Should correctly return a tree from a content to string call":function(assert) {
     var parts = fixture('ls_tree_a', true).split('\n');
     var text = parts[parts.length - 1];
     
@@ -103,11 +107,11 @@ suite.addTests({
       assert.equal('650fa3f0c17f1edb4ae53d8dcca4ac59d86e6c44', tree.id);
       assert.equal('040000', tree.mode);
       assert.equal('test', tree.name);
-      finished();
+      assert.done();
     });
   },
   
-  "Should correctly return blob from tree from string":function(assert, finished) {
+  "Should correctly return blob from tree from string":function(assert) {
     var parts = fixture('ls_tree_b', true).split('\n');
     var text = parts[0];
     
@@ -116,32 +120,32 @@ suite.addTests({
       assert.equal('aa94e396335d2957ca92606f909e53e7beaf3fbb', tree.id);
       assert.equal('100644', tree.mode);
       assert.equal('grit.rb', tree.name);
-      finished();
+      assert.done();
     });
   },
   
-  "Should correctly return submodule from tree from string":function(assert, finished) {
+  "Should correctly return submodule from tree from string":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       var parts = fixture('ls_tree_submodule', true).split('\n');
       var text = parts[0];
       
       Tree.content_from_string(null, text, function(err, tree) {
         assert.ok(tree instanceof Submodule);
-        finished();
+        assert.done();
       });
     });
   },
   
-  "Should correctly return error due to invalid type":function(assert, finished) {
+  "Should correctly return error due to invalid type":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       Tree.content_from_string(null, "040000 bogus 650fa3f0c17f1edb4ae53d8dcca4ac59d86e6c44  test", function(err, tree) {
         assert.equal("invalid type: bogus", err);
-        finished();
+        assert.done();
       });
     });
   },
   
-  "Should correctly find file in tree":function(assert, finished) {
+  "Should correctly find file in tree":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.ls_tree = function() {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -152,12 +156,12 @@ suite.addTests({
       repo.tree('master', function(err, tree) {
         assert.equal('aa06ba24b4e3f463b3c4a85469d0fb9e5b421cf8', tree.find('lib').id);
         assert.equal('8b1e02c0fb554eed2ce2ef737a68bb369d7527df', tree.find('README.txt').id);
-        finished();
+        assert.done();
       });
     });
   },
   
-  "Should correctly test find file with commits":function(assert, finished) {
+  "Should correctly test find file with commits":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       repo.git.ls_tree = function() {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -169,16 +173,16 @@ suite.addTests({
         assert.equal('d35b34c6e931b9da8f6941007a92c9c9a9b0141a', tree.find('bar').id);
         assert.equal('2afb47bcedf21663580d5e6d2f406f08f3f65f19', tree.find('foo').id);
         assert.equal('f623ee576a09ca491c4a27e48c0dfe04be5f4a2e', tree.find('baz').id);
-        finished();
+        assert.done();
       });
     });
   },
   
-  "Should correctly extract base name":function(assert, finished) {
+  "Should correctly extract base name":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
       Tree.create(repo, {name:'foo/bar'}, function(err, tree) {
         assert.equal('bar', tree.basename);
-        finished();
+        assert.done();
       });      
     });
   }

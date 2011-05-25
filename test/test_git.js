@@ -1,42 +1,46 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
-  Git = require('git').Git;
-
-var suite = exports.suite = new TestSuite("node-git tests");
+var testCase = require('nodeunit').testCase,
+  Git = require('../lib/git').Git;
 
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  "Should correctly call native git method":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly call native git method":function(assert) {
     var git = new Git("./test/grit");
     git.git('version', function(err, result) {
       assert.ok(!err);
       assert.ok(result.match(/^git version [\w\.]*/));
-      finished();
+      assert.done();
     });
   },
   
-  "Should fail to call wrong native method":function(assert, finished) {
+  "Should fail to call wrong native method":function(assert) {
     var git = new Git("./test/grit");
     git.git('bad', function(err, result) {
       assert.ok(err);
       assert.ok(err.indexOf("git: 'bad' is not a git command") != -1);
-      finished();
+      assert.done();
     })
   }, 
   
-  "Should fail to call wrong native function with skip timeout":function(assert, finished) {
+  "Should fail to call wrong native function with skip timeout":function(assert) {
     var git = new Git("./test/grit");
     git.git('bad', {timeout:false}, function(err, result) {
       assert.ok(err);
       assert.ok(err.indexOf("git: 'bad' is not a git command") != -1);
-      finished();
+      assert.done();
     })    
   },
   
-  "Should correctly transform options":function(assert, finished) {
+  "Should correctly transform options":function(assert) {
     var git = new Git("./test/grit");
     assert.deepEqual(["-s"], git.transform_options({s:true}));
     assert.deepEqual([], git.transform_options({s:false}));
@@ -46,10 +50,10 @@ suite.addTests({
     assert.deepEqual(["--max-count='5'"], git.transform_options({max_count:5}));
   
     assert.deepEqual(["-s", "-t"], git.transform_options({s:true, t:true}));
-    finished();
+    assert.done();
   },
   
-  "Should correctly escape calls to the git shell":function(assert, finished) {
+  "Should correctly escape calls to the git shell":function(assert) {
     var git = new Git("./test/grit");
     git.exec = function(call, options, callback) {
       assert.equal(Git.git_binary + " --git-dir='./test/grit' foo --bar='bazz\\'er'", call)
@@ -65,12 +69,12 @@ suite.addTests({
       };      
   
       git.git('bar', {x:"quu'x"}, function(err, result) {
-        finished();
+        assert.done();
       });
     });
   },
   
-  "Should correctly escape standalone argument":function(assert, finished) {
+  "Should correctly escape standalone argument":function(assert) {
     var git = new Git("./test/grit");
     git.exec = function(call, options, callback) {
       assert.equal(Git.git_binary + " --git-dir='./test/grit' foo 'bar\\'s'", call)
@@ -86,7 +90,7 @@ suite.addTests({
       };      
   
       git.git('foo', {}, "bar", "; echo 'noooo'", function(err, result) {
-        finished();
+        assert.done();
       });
     });
   }

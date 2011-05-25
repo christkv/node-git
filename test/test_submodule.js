@@ -1,15 +1,11 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+var testCase = require('nodeunit').testCase,
   fs = require('fs'),
   exec  = require('child_process').exec,
-  Repo = require('git').Repo,
-  BinaryParser = require('git').BinaryParser,
-  Actor = require('git').Actor,
-  Blob = require('git').Blob,
-  Submodule = require('git').Submodule;
-
-var suite = exports.suite = new TestSuite("node-git submodule tests");
+  Repo = require('../lib/git').Repo,
+  BinaryParser = require('../lib/git').BinaryParser,
+  Actor = require('../lib/git').Actor,
+  Blob = require('../lib/git').Blob,
+  Submodule = require('../lib/git').Submodule;
 
 var to_bin = function(sha1o) {
   var sha1 = '';
@@ -52,8 +48,16 @@ var destroy_directory = function(directory, callback) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  "Should correctly extract the config":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly extract the config":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var data = fixture('gitmodules');
       var blob = {data:data, id:'abc'};
@@ -69,12 +73,12 @@ suite.addTests({
       Submodule.config(repo, function(err, config) {
         assert.equal('git://github.com/mojombo/glowstick', config['test/glowstick']['url']);
         assert.equal('git://github.com/mojombo/god', config['god']['url']);
-        finished();        
+        assert.done();        
       });
     });
   },
   
-  "Should correctly fetch config with windows lineendings":function(assert, finished) {
+  "Should correctly fetch config with windows lineendings":function(assert) {
     var data = fixture('gitmodules').replace(/\n/g, '\r\n');
     var blob = {data:data, id:'abc'};
     var tree = {find:function() { return blob; }};
@@ -88,11 +92,11 @@ suite.addTests({
     Submodule.config(repo, function(err, config) {
       assert.equal('git://github.com/mojombo/glowstick', config['test/glowstick']['url']);
       assert.equal('git://github.com/mojombo/god', config['god']['url']);
-      finished();
+      assert.done();
     });
   },
   
-  "Should correctly test no config":function(assert, finished) {
+  "Should correctly test no config":function(assert) {
     var tree = {find:function() { return null; }};
     var commit = {tree:tree};
     var repo = {commit:function() { 
@@ -103,11 +107,11 @@ suite.addTests({
     
     Submodule.config(repo, function(err, config) {
       assert.deepEqual({}, config);
-      finished();
+      assert.done();
     });
   },
   
-  "Should correctly test empty config":function(assert, finished) {
+  "Should correctly test empty config":function(assert) {
     var blob = {data:'', id:'abc'};
     var tree = {find:function() { return blob; }};
     var commit = {tree:tree};
@@ -119,16 +123,16 @@ suite.addTests({
       
     Submodule.config(repo, function(err, config) {
       assert.deepEqual({}, config);
-      finished();
+      assert.done();
     });
   },
   
   //  inspect 
-  "Should correctly extract base name":function(assert, finished) {
+  "Should correctly extract base name":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       Submodule.create(repo, {name:'foo/bar'}, function(err, submodule) {
         assert.equal('bar', submodule.basename);
-        finished();        
+        assert.done();        
       });
     });
   },

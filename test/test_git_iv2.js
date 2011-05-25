@@ -1,14 +1,10 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+var testCase = require('nodeunit').testCase,
   fs = require('fs'),
   exec  = require('child_process').exec,
-  Repo = require('git').Repo,
-  BinaryParser = require('git').BinaryParser,
-  Actor = require('git').Actor,
-  Blob = require('git').Blob;
-
-var suite = exports.suite = new TestSuite("node-git iv2 tests");
+  Repo = require('../lib/git').Repo,
+  BinaryParser = require('../lib/git').BinaryParser,
+  Actor = require('../lib/git').Actor,
+  Blob = require('../lib/git').Blob;
 
 var to_bin = function(sha1o) {
   var sha1 = '';
@@ -51,8 +47,16 @@ var destroy_directory = function(directory, callback) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  "Should correctly execute basic test":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly execute basic test":function(assert) {
     var commit_sha = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a';
     var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
     var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce';
@@ -64,13 +68,13 @@ suite.addTests({
         
         repo.commits(function(err, commits) {
           assert.equal(10, commits.length);
-          finished();
+          assert.done();
         });        
       })
     });
   },
   
-  "Should correctly test objects":function(assert, finished) {
+  "Should correctly test objects":function(assert) {
     var commit_sha = 'ca8a30f5a7f0f163bbe3b6f0abf18a6c83b0687a';
     var tree_sha = 'cd7422af5a2e0fff3e94d6fb1a8fff03b2841881';
     var blob_sha = '4232d073306f01cf0b895864e5a5cfad7dd76fce';
@@ -84,7 +88,7 @@ suite.addTests({
       assert.equal(7, tree.entries.length);
       var blob = rgit.get_object_by_sha1(blob_sha);
       assert.ok(blob.content.indexOf('First public release') != -1);
-      finished();
+      assert.done();
     });
   }  
 });

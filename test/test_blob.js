@@ -1,30 +1,34 @@
-
-TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
-  Repo = require('git').Repo,
+var testCase = require('nodeunit').testCase,
+  Repo = require('../lib/git').Repo,
   fs = require('fs'),
-  Blob = require('git').Blob,
-  Commit = require('git').Commit;
-
-var suite = exports.suite = new TestSuite("blob tests");
+  Blob = require('../lib/git').Blob,
+  Commit = require('../lib/git').Commit;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
 }
 
-suite.addTests({  
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
   // blob
-  "Should not locate blob":function(assert, finished) {
+  "Should not locate blob":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.blob("blahblah", function(err, blob) {
         assert.ok(blob instanceof Blob);
-        finished();
+        assert.done();
       });
     });
   },
   
-  "Should correctly return blob contents":function(assert, finished) {
+  "Should correctly return blob contents":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.cat_file = function(type, ref, callback) {
@@ -33,11 +37,11 @@ suite.addTests({
         
       var blob = new Blob(repo, 'abc');
       assert.equal("Hello world", blob.data);
-      finished();
+      assert.done();
     });
   },
   
-  "Should correctly cache data":function(assert, finished) {
+  "Should correctly cache data":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var times_called = 0;
@@ -51,12 +55,12 @@ suite.addTests({
       var blob = new Blob(repo, 'abc');
       assert.equal("Hello world", blob.data);
       assert.equal("Hello world", blob.data);
-      finished();
+      assert.done();
     });
   },
   
   // size
-  "Should correctly return the file size":function(assert, finished) {
+  "Should correctly return the file size":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.cat_file = function(type, ref, callback) {
@@ -65,34 +69,34 @@ suite.addTests({
         
       var blob = new Blob(repo, 'abc');
       assert.equal(11, blob.size);
-      finished();
+      assert.done();
     });             
   },
   
   // data
   
   // mime_type
-  "Should correctly return mime_type for known types":function(assert, finished) {
+  "Should correctly return mime_type for known types":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var blob = new Blob(repo, null, 'abc', 'foo.png');
       assert.equal('image/png', blob.mime_type);
-      finished();
+      assert.done();
     });
   },
   
-  "Should correctly return text plain for unknown types":function(assert, finished) {
+  "Should correctly return text plain for unknown types":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var blob = new Blob(repo, 'abc');
       assert.equal('text/plain', blob.mime_type);
-      finished();
+      assert.done();
     });    
   },
   
   // blame
   
-  "Should correctly grab the blame":function(assert, finished) {
+  "Should correctly grab the blame":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.git.blame = function(type, ref, callback) {
@@ -116,17 +120,17 @@ suite.addTests({
         assert.equal('tom@mojombo.com', commit.committer.email);
         assert.deepEqual(new Date(1191997100 * 1000), commit.committed_date);
         assert.equal('initial grit setup', commit.message);        
-        finished();
+        assert.done();
       });
     });
   },
   
-  "Should correctly return the base name":function(assert, finished) {
+  "Should correctly return the base name":function(assert) {
     // Open the first repo
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       var blob = new Blob(repo, null, null, 'foo/bar.rb');
       assert.equal('bar.rb', blob.basename);
-      finished();
+      assert.done();
     });        
   }
 });

@@ -1,11 +1,7 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+var testCase = require('nodeunit').testCase,
   fs = require('fs'),
-  Repo = require('git').Repo,
-  Merge = require('git').Merge;
-
-var suite = exports.suite = new TestSuite("remote tests");
+  Repo = require('../lib/git').Repo,
+  Merge = require('../lib/git').Merge;
 
 var fixture = function(name, trim) {
   return trim ? fs.readFileSync("./test/fixtures/" + name, 'ascii').trim() : fs.readFileSync("./test/fixtures/" + name, 'ascii');
@@ -14,12 +10,20 @@ var fixture = function(name, trim) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  "Should correctly parse the raw object":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  "Should correctly parse the raw object":function(assert) {
     new Repo("./test/grit", {is_bare:true}, function(err, repo) {
       repo.remotes(function(err, remotes) {
         assert.ok(remotes.length > 0)
-        finished();
+        assert.done();
       })
     });        
   }

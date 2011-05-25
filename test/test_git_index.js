@@ -1,14 +1,10 @@
-
-var TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+var testCase = require('nodeunit').testCase,
   fs = require('fs'),
   exec  = require('child_process').exec,
-  Repo = require('git').Repo,
-  BinaryParser = require('git').BinaryParser,
-  Actor = require('git').Actor,
-  Blob = require('git').Blob;
-
-var suite = exports.suite = new TestSuite("node-git index tests");
+  Repo = require('../lib/git').Repo,
+  BinaryParser = require('../lib/git').BinaryParser,
+  Actor = require('../lib/git').Actor,
+  Blob = require('../lib/git').Blob;
 
 var to_bin = function(sha1o) {
   var sha1 = '';
@@ -51,8 +47,16 @@ var destroy_directory = function(directory, callback) {
 /**
   Test basic node-git functionality
 **/
-suite.addTests({
-  // "Sould correctly add files":function(assert, finished) {
+module.exports = testCase({   
+  setUp: function(callback) {
+    callback();
+  },
+  
+  tearDown: function(callback) {
+    callback();
+  },
+
+  // "Sould correctly add files":function(assert) {
   //   var base_repo = "./test/dot_git_iv2"
   // 
   //   create_tmp_directory(base_repo, function(err, target_path) {
@@ -75,7 +79,7 @@ suite.addTests({
   //                 assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
   //                 // Destory directory and cleanup
   //                 destroy_directory(target_path, function(err, result) {          
-  //                   finished();
+  //                   assert.done();
   //                 });                
   //               });
   //             });
@@ -86,7 +90,7 @@ suite.addTests({
   //   });
   // },
   // 
-  // "Should correctly add path file":function(assert, finished) {
+  // "Should correctly add path file":function(assert) {
   //   var base_repo = "./test/dot_git_iv2"
   // 
   //   create_tmp_directory(base_repo, function(err, target_path) {
@@ -113,7 +117,7 @@ suite.addTests({
   //                 assert.equal('77aa887449c28a922a660b2bb749e4127f7664e5', c.id)
   //                 // Destroy directory and cleanup
   //                 destroy_directory(target_path, function(err, result) {          
-  //                   finished();
+  //                   assert.done();
   //                 });                
   //               });
   //             });
@@ -124,7 +128,7 @@ suite.addTests({
   //   });    
   // },
   // 
-  // "Should correctly add correct order for commited files":function(assert, finished) {
+  // "Should correctly add correct order for commited files":function(assert) {
   //   var base_repo = "./test/dot_git_iv2"
   // 
   //   create_tmp_directory(base_repo, function(err, target_path) {
@@ -152,7 +156,7 @@ suite.addTests({
   //                 assert.equal('lib', entries[1]);                  
   //                 // Destroy directory and cleanup
   //                 destroy_directory(target_path, function(err, result) {          
-  //                   finished();
+  //                   assert.done();
   //                 });                
   //               });
   //             });
@@ -163,7 +167,7 @@ suite.addTests({
   //   });        
   // },
   // 
-  // "Should correctly modify file":function(assert, finished) {
+  // "Should correctly modify file":function(assert) {
   //   var base_repo = "./test/dot_git_iv2"
   // 
   //   create_tmp_directory(base_repo, function(err, target_path) {
@@ -188,7 +192,7 @@ suite.addTests({
   //                 assert.equal('e45d6b418e34951ddaa3e78e4fc4d3d92a46d3d1', b.id);
   //                 // Destroy directory and cleanup
   //                 destroy_directory(target_path, function(err, result) {          
-  //                   finished();
+  //                   assert.done();
   //                 });                
   //               });
   //             });
