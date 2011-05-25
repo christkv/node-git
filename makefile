@@ -1,7 +1,8 @@
 
 NODE = node
+NODEUNIT = nodeunit
 
 test:
-	@$(NODE) test/test_all.js
+	@$(NODEUNIT) test/
 
 .PHONY: test
