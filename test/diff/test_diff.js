@@ -1,6 +1,6 @@
 
 TestSuite = require('async_testing').TestSuite,
-  sys = require('sys'),
+  util = require('util'),
   Difference = require('diff/diff').Difference,
   ContextChange = require('diff/change').ContextChange,
   Change = require('diff/change').Change;

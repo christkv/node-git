@@ -1,6 +1,6 @@
 
 var Repo = require('git/repo').Repo,
-  sys = require('sys'),
+  util = require('util'),
   fs = require('fs'),
   exec  = require('child_process').exec;
 
@@ -14,7 +14,7 @@ var create_tmp_directory = function(clone_path, callback) {
   // Copy the old directory to the new one
   var child = exec('cp -R ' + clone_path + ' ' + tmp_path, function (error, stdout, stderr) {
       if (error !== null) {
-        sys.puts('exec error: ' + error);
+        util.puts('exec error: ' + error);
         return callback(error, null);
       }
       return callback(null, tmp_path);
@@ -25,7 +25,7 @@ var destroy_directory = function(directory, callback) {
   // Copy the old directory to the new one
   var child = exec('rm -rf ' + directory, function (error, stdout, stderr) {
       if (error !== null) {
-        sys.puts('exec error: ' + error);
+        util.puts('exec error: ' + error);
         return callback(error, null);
       }
       return callback(null, null);    
@@ -125,7 +125,7 @@ var execute_process = function(type) {
         
         var end_time = new Date();
         var total_miliseconds = end_time.getTime() - start_time.getTime();
-        sys.puts("[" + type + "]::executed in: " + (total_miliseconds/1000) + " seconds");        
+        util.puts("[" + type + "]::executed in: " + (total_miliseconds/1000) + " seconds");        
         // Delete the directory
         destroy_directory(target_path, function(err, result) {});
       });      
@@ -144,7 +144,7 @@ if(process.argv.length > 2 && process.argv[2].match(/packobj|commits1|commits2|b
     execute_process(process.argv[2]);
   }  
 } else {
-  sys.puts("Please provide the benchmark you wish to run in the form <node benchmarks [packobj|commits1|commits2|big_revlist|log|diff|commit_diff|heads|all]>")
+  util.puts("Please provide the benchmark you wish to run in the form <node benchmarks [packobj|commits1|commits2|big_revlist|log|diff|commit_diff|heads|all]>")
 }
   
 
