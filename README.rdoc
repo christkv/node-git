@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/christkv/node-git.png)](http://travis-ci.org/christkv/node-git)
 = Introduction
 
 This is a library for Git written in Node.js. It's as close a port of grit http://github.com/mojombo/grit.
