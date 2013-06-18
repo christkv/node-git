@@ -13,7 +13,10 @@
 , "main":             "./lib/git/index"
 , "directories" :   { "lib" : "./lib/git" }
 , "engines" :       { "node" : ">=0.4.0" }
-, "dependencies":   { "compress" : ">=0.1.6" }
+, "dependencies":   {
+      "compress" : ">=0.1.6"
+    , "mime": "1.2.9"
+  }
 , "devDependencies":{ "nodeunit" : ">=0.5.1" }
 , "licenses" :    [ { "type" :  "Apache License, Version 2.0"
                     , "url" :   "http://www.apache.org/licenses/LICENSE-2.0" } ]
