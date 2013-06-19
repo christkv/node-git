@@ -14,4 +14,5 @@
 , "devDependencies":{ "nodeunit" : ">=0.5.1" }
 , "licenses" :    [ { "type" :  "Apache License, Version 2.0"
                     , "url" :   "http://www.apache.org/licenses/LICENSE-2.0" } ]
+, "scripts" :       { "test" : "./node_modules/.bin/nodeunit test" }
 }
