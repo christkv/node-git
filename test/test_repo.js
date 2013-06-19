@@ -34,7 +34,7 @@ var fixture = function(name, trim) {
 
 var destroy_directory = function(directory, callback) {
   // Copy the old directory to the new one
-  var child = exec('rm -rf ' + directory, function (error, stdout, stderr) {
+  var child = exec('rm -rf ' + directory.replace('/dot_git', ''), function (error, stdout, stderr) {
       if (error !== null) {
         sys.puts('exec error: ' + error);
         return callback(error, null);
@@ -81,10 +81,8 @@ module.exports = testCase({
                       assert.ok(nonpack_head_2.commit.sha != nonpack_head.commit.sha);
                 
                       destroy_directory(target_path, function(err, result) {
-                        GitFileOperations.fs_rmdir_r(target_path, function(err, result) {
                           assert.done();
-                        });
-                      })
+                      });
                     });            
                   })
                 })      
