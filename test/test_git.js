@@ -44,10 +44,10 @@ module.exports = testCase({
     var git = new Git("./test/grit");
     assert.deepEqual(["-s"], git.transform_options({s:true}));
     assert.deepEqual([], git.transform_options({s:false}));
-    assert.deepEqual(["-s '5'"], git.transform_options({s:5}));
+    assert.deepEqual(["-s \"5\""], git.transform_options({s:5}));
   
     assert.deepEqual(["--max-count"], git.transform_options({max_count:true}));
-    assert.deepEqual(["--max-count='5'"], git.transform_options({max_count:5}));
+    assert.deepEqual(["--max-count=\"5\""], git.transform_options({max_count:5}));
   
     assert.deepEqual(["-s", "-t"], git.transform_options({s:true, t:true}));
     assert.done();
