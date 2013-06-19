@@ -25,7 +25,7 @@ module.exports = testCase({
   },
 
   "Should correctly init gitdir":function(assert) {
-    var tmp_path = '/tmp/gitdir';
+    var tmp_path = './test/tmp';
     GitFileOperations.fs_rmdir_r(tmp_path, function(err, result) {
       // Create a temp directory
       fs.mkdirSync(tmp_path, 16877);
@@ -34,7 +34,10 @@ module.exports = testCase({
       git.init({}, function(err, git) {
         var stat = fs.statSync(tmp_path + "/config");
         assert.equal(true, stat.isFile());   
-        assert.done();
+
+        GitFileOperations.fs_rmdir_r(tmp_path, function(err, result) {
+          assert.done();
+        });
       });      
     })
   },

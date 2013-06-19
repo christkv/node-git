@@ -15,7 +15,7 @@ var testCase = require('nodeunit').testCase,
 
 var create_tmp_directory = function(clone_path, callback) {
   var filename = 'git_test' + new Date().getTime().toString() + Math.round((Math.random(100000) * 300)).toString();
-  var tmp_path = '/tmp/' + filename;
+  var tmp_path = './test/' + filename;
   // Create directory
   fs.mkdirSync(tmp_path, 0777);
   // Copy the old directory to the new one
@@ -81,7 +81,9 @@ module.exports = testCase({
                       assert.ok(nonpack_head_2.commit.sha != nonpack_head.commit.sha);
                 
                       destroy_directory(target_path, function(err, result) {
-                        assert.done();        
+                        GitFileOperations.fs_rmdir_r(target_path, function(err, result) {
+                          assert.done();
+                        });
                       })
                     });            
                   })
@@ -95,7 +97,7 @@ module.exports = testCase({
   },
   
   "Should raise error on invalid repo location":function(assert) {
-    new Repo('/tmp', function(err, repo) {
+    new Repo('./test', function(err, repo) {
       assert.equal("invalid git repository", err);
       assert.done();
     });
