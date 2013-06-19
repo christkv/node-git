@@ -1,15 +1,12 @@
 { "name" :            "git"
 , "description" :     "A node.js library for git"
-, "version" :         "0.1.4"
+, "version" :         "0.1.5"
 , "author" :          "Christian Amor Kvalheim <christkv@gmail.com>"
 , "contributors" :  [ "Vincent Giersch <vincent@giersch.fr>" ]
 , "repository" :    { "type" :  "git"
                     , "url" :   "git@github.com:christkv/node-git.git" }
 , "bugs" :          { "mail" :  "node-git@googlegroups.com"
                     , "web" :   "http://groups.google.com/group/nodegit" }
-, "os" :            [ "linux"
-                    , "darwin"
-                    , "freebsd" ]
 , "main":             "./lib/git/index"
 , "directories" :   { "lib" : "./lib/git" }
 , "engines" :       { "node" : ">=0.4.0" }

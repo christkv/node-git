@@ -17,6 +17,10 @@ You can either clone the repository or download a tarball of the latest release.
 Once you have the source you can test the driver by running
 
 	$ make test
+
+On windows:
+
+	PS > node.exe .\node_modules\nodeunit\bin\nodeunit .\test
 	
 ## Examples
 
