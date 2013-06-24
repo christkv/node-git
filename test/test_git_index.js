@@ -56,7 +56,7 @@ module.exports = testCase({
     callback();
   },
 
-  "Sould correctly add files":function(assert) {
+  "Should correctly add files":function(assert) {
     var base_repo = "./test/dot_git_iv2"
   
     create_tmp_directory(base_repo, function(err, target_path) {
