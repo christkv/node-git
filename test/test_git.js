@@ -56,14 +56,14 @@ module.exports = testCase({
   "Should correctly escape calls to the git shell":function(assert) {
     var git = new Git("./test/grit");
     git.exec = function(call, options, callback) {
-      assert.equal(Git.git_binary + " --git-dir='./test/grit' foo --bar='bazz\\'er'", call)
+      assert.equal(Git.git_binary + " --git-dir=\"./test/grit\" foo --bar=\"bazz\'er\"", call)
       assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
       callback(null, null);
     };
   
     git.git('foo', {bar:"bazz'er"}, function(err, result) {
       git.exec = function(call, options, callback) {
-        assert.equal(Git.git_binary + " --git-dir='./test/grit' bar -x 'quu\\'x'", call)
+        assert.equal(Git.git_binary + " --git-dir=\"./test/grit\" bar -x \"quu\'x\"", call)
         assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
         callback(null, null);
       };      
@@ -77,14 +77,14 @@ module.exports = testCase({
   "Should correctly escape standalone argument":function(assert) {
     var git = new Git("./test/grit");
     git.exec = function(call, options, callback) {
-      assert.equal(Git.git_binary + " --git-dir='./test/grit' foo 'bar\\'s'", call)
+      assert.equal(Git.git_binary + " --git-dir=\"./test/grit\" foo \"bar\'s\"", call)
       assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
       callback(null, null);
     };
   
     git.git('foo', {}, "bar's", function(err, result) {
       git.exec = function(call, options, callback) {
-        assert.equal(Git.git_binary + " --git-dir='./test/grit' foo 'bar' '\\; echo \\'noooo\\''", call)
+        assert.equal(Git.git_binary + " --git-dir=\"./test/grit\" foo \"bar\" \"\\; echo \'noooo\'\"", call)
         assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
         callback(null, null);
       };      
@@ -92,6 +92,27 @@ module.exports = testCase({
       git.git('foo', {}, "bar", "; echo 'noooo'", function(err, result) {
         assert.done();
       });
+    });
+  },
+
+  "Should correctly escape git binary arguments":function(assert) {
+  	var git = new Git("./test/grit");
+  	git.exec = function(call, options, callback) {
+      assert.equal(Git.git_binary + " --git-dir=\"./test/grit\" --bar=\"bazz\'er\" foo ", call)
+      assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
+      callback(null, null);
+    };
+
+    git.call_git('', 'foo', {bar: "bazz'er"}, '', {}, [], function(err, result) {
+     	git.exec = function(call, options, callback) {
+	      assert.equal(Git.git_binary + " --git-dir=\"./test/grit\" -x \"quu\'x\" foo ", call)
+	      assert.deepEqual({ encoding: 'utf8', timeout: 60000, killSignal: 'SIGKILL'}, options);
+	      callback(null, null);
+	    };
+
+	    git.call_git('', 'foo', {x: "quu'x"}, '', {}, [], function(err, result) {
+	    	assert.done();
+	    });
     });
   }
 });
