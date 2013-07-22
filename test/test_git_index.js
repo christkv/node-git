@@ -115,10 +115,14 @@ module.exports = testCase({
                   assert.equal('f80c3b68482d5e1c8d24c9b8139340f0d0a928d0', c.id)
                   c = _commits[0].tree.find('lib').find('grit.rb');
                   assert.equal('77aa887449c28a922a660b2bb749e4127f7664e5', c.id)
-                  // Destroy directory and cleanup
-                  destroy_directory(target_path, function(err, result) {          
-                    assert.done();
-                  });                
+
+                  // Tries to commit twice
+                  index.commit('message', [_commits[0]], user, null, 'master', function(err, result) {
+                    // Destroy directory and cleanup
+                    destroy_directory(target_path, function(err, result) {
+                      assert.done();
+                    });
+                  });
                 });
               });
             });
