@@ -112,11 +112,11 @@ module.exports = testCase({
   
   "Test diff with files":function(assert) {
     new Repo("./test/dot_git", {is_bare:true}, function(err, repo) {
-      repo.git.call_git = function(a, b, c, d, e, callback) {
+      repo.git.call_git = function(a, b, c, d, e, f, callback) {
           var args = Array.prototype.slice.call(arguments, 1);
           callback = args.pop();
-          assert.equal(true, d['full_index']);
-          assert.deepEqual([ '59ddc32', '--', 'lib' ], e);
+          assert.equal(true, e['full_index']);
+          assert.deepEqual([ '59ddc32', '--', 'lib' ], f);
           callback(null, fixture('diff_f'));
         }
         
