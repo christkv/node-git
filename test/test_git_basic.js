@@ -32,6 +32,9 @@ module.exports = testCase({
       // create Git repo
       var git = new Git(tmp_path);
       git.init({}, function(err, git) {
+        assert.equal(null, err);
+        assert.ok(git);
+
         var stat = fs.statSync(tmp_path + "/config");
         assert.equal(true, stat.isFile());   
 
