@@ -2,7 +2,7 @@ var testCase = require('nodeunit').testCase,
   Repo = require('../lib/git').Repo,
   Git = require('../lib/git').Git,
   fs = require('fs'),
-  Commit = require('../lib/git').Commit,
+  Commit = require('../lib/git/internal/git_commit').GitCommit,
   Blob = require('../lib/git').Blob,
   GitFileOperations = require('../lib/git').GitFileOperations;
 
@@ -22,6 +22,39 @@ module.exports = testCase({
   
   tearDown: function(callback) {
     callback();
+  },
+
+  "GitCommit.raw_log eliminates final empty line":function(assert) {
+    var message = 'first line\nsecond line\n';
+    var headers = 'headers';
+    var sha = 'SHA';
+
+    var expected = 'commit SHA\n' +
+      'headers\n\n' +
+      '    first line\n' +
+      '    second line\n\n';
+
+    var commit = new Commit(null, null, null, null, message, headers);
+
+    assert.equal(expected, commit.raw_log(sha));
+    assert.done();
+  },
+
+  "GitCommit.raw_log does not drop final line if non-empty":function(assert) {
+    var message = 'first line\nsecond line\nthird line';
+    var headers = 'headers';
+    var sha = 'SHA';
+
+    var expected = 'commit SHA\n' +
+      'headers\n\n' +
+      '    first line\n' +
+      '    second line\n' +
+      '    third line\n\n';
+
+    var commit = new Commit(null, null, null, null, message, headers);
+
+    assert.equal(expected, commit.raw_log(sha));
+    assert.done();
   },
 
   "Should correctly init gitdir":function(assert) {
